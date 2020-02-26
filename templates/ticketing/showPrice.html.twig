@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+<div id="main">
+
+	<!-- Intro -->
+		<article id="intro">
+			<h2 class="major">{{ title }}</h2>
+			<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
+			<section>
+					<div class="table-wrapper">
+						<table>
+							<tbody>
+								<thead>
+									<tr>
+										<th>Billet</th>
+										<th>Tarif Journée</th>
+										<th>Tarif Demi-journée*</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>Tarif enfant (de 4 à 11 ans)**</td>
+									<td>{{ fullPriceChild }}€</td>
+									<td>{{ halfPriceChild }}€</td>
+								</tr>
+								<tr>
+									<td>Tarif normal (de 12 à 59 ans)</td>
+									<td>{{ fullPriceNormal }}€</td>
+									<td>{{ halfPriceNormal }}€</td>
+								</tr>
+								<tr>
+									<td>Tarif senior (à partir de 60 ans)</td>
+									<td>{{ fullPriceSenior }}€</td>
+									<td>{{ halfPriceSenior }}€</td>
+								</tr>
+								<tr>
+									<td>Tarif réduit***</td>
+									<td>{{ fullPriceReduction }}€</td>
+									<td>{{ halfPriceReduction }}€</td>
+								</tr>	
+							</tbody>
+						</table>
+					</div>	
+			<p>* Entrée à partir de 14h<br/>
+			   ** Gratuit pour les moins de 4 ans<br/>
+			   *** Votre carte étudiant, militaire ou équivalent pourra vous être demandée à l'entrée du musée.<br/>
+		</article>				
+{% endblock %}

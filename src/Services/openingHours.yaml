@@ -1,0 +1,39 @@
+jours_ouverts :
+  lundi : true
+  mardi : false
+  mercredi : true
+  jeudi : true
+  vendredi : true
+  samedi : true
+  dimanche : true
+  
+jours_reservables :
+  lundi : true
+  mardi : true
+  mercredi : true
+  jeudi : true
+  vendredi : true
+  samedi : true
+  dimanche : false
+
+vacances :
+  -1/1
+  -1/5
+  -8/5
+  -14/7
+  -15/8
+  -1/11
+  -11/11
+  -25/12
+
+jours_fermes : 
+  -1/1
+  -1/11
+  -25/12
+
+horaires :
+  ouverture : 8
+  apres_midi : 14
+  fermeture : 18
+
+total_tickets_max : 1000

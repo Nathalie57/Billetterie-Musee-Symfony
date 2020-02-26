@@ -1,0 +1,22 @@
+bebe : 
+  age_max :           3
+  prix :              0
+  prix_demi_journee : 0
+
+enfant :
+  age_max :           12
+  prix :              8
+  prix_demi_journee : 4
+
+normal :
+  age_max :           59
+  prix :              16
+  prix_demi_journee : 8
+
+senior :
+  prix :              12
+  prix_demi_journee : 6
+
+tarif_reduit : 
+  prix :              10
+  prix_demi_journee : 5
