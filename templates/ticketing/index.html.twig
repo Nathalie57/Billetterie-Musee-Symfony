@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<body>
+        
+        <body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="logo">
+							<span class="icon fa-gem"></span>
+						</div>
+						<div class="content">
+							<div class="inner">
+								<h1>Billeterie du Musée du Louvre</h1>
+								<p>Réservez facilement vos billets pour visiter le Musée !</p>
+							</div>
+						</div>
+						<nav>
+							{#<ul>
+								<li><a href="{{ path('opening_hours') }}">Les horaires</a></li>
+								<li><a href="{{ path('price') }}">Les tarifs</a></li>
+								<li><a href="{{ path('order') }}">Réservation</a></li>
+								<li><a href="#contact">Contact</a></li>
+							</ul>#}
+						</nav>
+					</header>
+    <h1>{{ title }}</h1>
+
+  
+{% endblock %}
