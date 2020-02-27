@@ -3,10 +3,15 @@
 {% block title %}{% endblock %}
 
 {% block body %}
-<section>
+    {% for user in ticketsNumber %}
+        {{ form_start(ticketForm) }}
+
+        {{ form_end(ticketForm) }}
+
+{#<section>
 	<h3 class="major">Veuillez entrer les détails pour chaque visiteur</h3>
 		<form method="post" action="#">
-			{#{% for order in ticketsNumber %}#}
+			{% for order in ticketsNumber %}
                 <div class="fields">
                     <div class="field half">
                         <label for="firstNameVisitor">Nom</label>
@@ -31,12 +36,12 @@
 						</div>
                     
                 </div>
-            {#{% endfor %}#}
+            {% endfor %}
             											
 				<ul class="actions">
 					<input type="submit" value="Valider" class="primary" />
 				</ul>
 		</form>
-	</section>
+	</section>#}
 
 {% endblock %}

@@ -9,12 +9,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use App\Services\CalculatePrice;
 use App\Services\AuthorizedDate;
 use App\Entity\User;
 use App\Entity\Ticket;
 use App\Form\UserType;
 use App\Form\TicketType;
+use App\Form\ClientType;
 use Ramsey\Uuid\Uuid;
 
 class TicketingController extends AbstractController
@@ -63,12 +65,16 @@ class TicketingController extends AbstractController
     public function choice(Request $request, User $user = null, SessionInterface $session, EntityManagerInterface $em)
 
     {
+       // $session = new Session();
+        //$session->start();
+        
         $user = new User();
         
         $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
 
         $user->setOrderCode(Uuid::uuid4());
+        $user->setOrderDate(date_create(), 'Y-M-d');
     
         /*$totalTicketsMax = 1000;
         $rawSql = "SELECT `visitDate`, SUM(`ticketsNumber`) as totalTickets FROM `order` WHERE visitDate >= DATE_SUB(curdate(), INTERVAL 0 DAY)";
@@ -86,15 +92,9 @@ class TicketingController extends AbstractController
       // die(var_dump($form->isSubmitted()));
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {
-         //  $entityManager = $this->getDoctrine()->getManager();
-         //   $data = $form->getData();   
-         //   die(var_dump($user));
-         /*   $user->setVisitDate($data->visitDate);    
-            $entityManager->persist($data);
-            $entityManager->flush();*/
-
-            $user = $session->get('id');
-            $session->set('id', $user);
+         
+            
+            $session->set('orderCode', $user->getOrderCode());
             
             $user = $userForm->getData();
 
@@ -102,7 +102,7 @@ class TicketingController extends AbstractController
             $em->persist($user);
             $em->flush();
             
-            return $this->redirectToRoute('/billetterie/commande');
+            return $this->redirectToRoute('visitors_designation');
         }
     
         return $this->render('ticketing/choiceForm.html.twig', array('choiceForm' => $userForm->createView()));
@@ -115,9 +115,9 @@ class TicketingController extends AbstractController
                
         $ticket = new Ticket();
         
-       /* if($session->get('orderCode')){
+        if($session->get('orderCode')){
             $ticket = $session->get('orderCode');
-        }*/
+        }
 
         $ticketForm = $this->createForm(TicketType::class, $ticket);
         $ticketForm->handleRequest($request);
@@ -128,11 +128,40 @@ class TicketingController extends AbstractController
             $entityManager->persist($ticket);
             $entityManager->flush();
 
-       //     $session->set('uuid', $ticket);
+            $session->set('id', $ticket);
             
-         //   return $this->redirectToRoute('identification');
+            return $this->redirectToRoute('identification');
         }
     
         return $this->render('ticketing/ticketForm.html.twig', array('ticketForm' => $ticketForm->createView()));
     }
+
+    /**
+     * @Route("/billetterie/identification", name="identification")
+     */ 
+    public function clientDesignation(Request $request, User $user = null, SessionInterface $session){
+
+        $user = new User();
+
+        if($session->get('id')){
+            $user = $session->get('id');
+        }
+
+        $form = $this->createForm(ClientType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $form->getData();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $user = $session->get('id');
+            $session->set('id', $user);
+            
+          //  return $this->redirectToRoute("/billetterie/paiement");
+        }
+    
+        return $this->render('ticketing/clientForm.html.twig', array('form' => $form->createView()));
+    }    
 }
