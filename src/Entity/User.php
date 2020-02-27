@@ -73,10 +73,6 @@ class User
      */
     private $tickets;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-
     public function getId(): ?int
     {
         return $this->id;
