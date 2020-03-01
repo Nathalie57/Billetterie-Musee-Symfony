@@ -91,49 +91,68 @@ class TicketingController extends AbstractController
         
       // die(var_dump($form->isSubmitted()));
 
-        if ($userForm->isSubmitted() && $userForm->isValid()) {
-         
-            
-            $session->set('orderCode', $user->getOrderCode());
+        if ($userForm->isSubmitted() && $userForm->isValid()) {          
             
             $user = $userForm->getData();
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
-            
+
+            $session->set('currentUserId', $user->getId());
+            $session->set('numberTickets', $user->getNumberTickets());
+
             return $this->redirectToRoute('visitors_designation');
         }
     
-        return $this->render('ticketing/choiceForm.html.twig', array('choiceForm' => $userForm->createView()));
+        return $this->render('ticketing/choiceForm.html.twig', [ 
+            'choiceForm' => $userForm->createView(),
+//            'currentUserId' => $user->getId()
+            ]);
     }
 
     /**
      * @Route("/billetterie/commande", name="visitors_designation")
      */
-    public function visitorsDesignation(Request $request, Ticket $ticket = null, SessionInterface $session){
-               
-        $ticket = new Ticket();
+    public function visitorsDesignation(EntityManagerInterface $em, Request $request, User $user = null, Ticket $ticket = null, SessionInterface $session){
         
-        if($session->get('orderCode')){
-            $ticket = $session->get('orderCode');
+        if($session->get('id')){  
+            $currentUserId = $session->get('id');
         }
 
-        $ticketForm = $this->createForm(TicketType::class, $ticket);
-        $ticketForm->handleRequest($request);
-    
-        if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {
-            $ticket = $ticketForm->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($ticket);
-            $entityManager->flush();
+        $repository = $em->getRepository(User::class);
+        $currentUser = $repository->findOneBy(['id' => $currentUserId]);
+       
+        if (!$currentUser) {
+            throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentUserId));
+        }
 
+        $currentNumberTickets = $currentUser->getNumberTickets();
+
+       /* if($currentNumberTickets==0){
+            for ($i = 1; $i <= $currentNumberTickets; $i++) {*/
+                $ticket = new Ticket(); 
+
+                $ticketForm = $this->createForm(TicketType::class, $ticket);
+                $ticketForm->handleRequest($request);
+    
+                if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {
+                    $newTicket = $ticketForm->getData();
+                    $entityManager = $this->getDoctrine()->getManager();
+                   
+                    $entityManager->persist($ticket);
+                    $entityManager->flush();      
+        
             $session->set('id', $ticket);
             
             return $this->redirectToRoute('identification');
-        }
+            }
+       
+    return $this->render('ticketing/ticketForm.html.twig', [
+        'ticketForm' => $ticketForm->createView(),
+        'numberTickets' => $currentNumberTickets
+        ]);
     
-        return $this->render('ticketing/ticketForm.html.twig', array('ticketForm' => $ticketForm->createView()));
     }
 
     /**
@@ -141,17 +160,17 @@ class TicketingController extends AbstractController
      */ 
     public function clientDesignation(Request $request, User $user = null, SessionInterface $session){
 
-        $user = new User();
+      //  $user = new User();
 
         if($session->get('id')){
             $user = $session->get('id');
         }
 
-        $form = $this->createForm(ClientType::class, $user);
-        $form->handleRequest($request);
+        $clientForm = $this->createForm(ClientType::class, $user);
+        $clientForm->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $form->getData();
+        if ($clientForm->isSubmitted() && $clientForm->isValid()) {
+            $user = $clientForm->getData();
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
@@ -159,9 +178,11 @@ class TicketingController extends AbstractController
             $user = $session->get('id');
             $session->set('id', $user);
             
-          //  return $this->redirectToRoute("/billetterie/paiement");
+            return $this->redirectToRoute("/billetterie/paiement");
         }
     
-        return $this->render('ticketing/clientForm.html.twig', array('form' => $form->createView()));
+        return $this->render('ticketing/clientForm.html.twig', [
+            'clientForm' => $clientForm->createView()
+        ]);
     }    
 }
