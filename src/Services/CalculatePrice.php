@@ -34,10 +34,12 @@ class CalculatePrice{
         $this->halfPriceReduction = $value['tarif_reduit']['prix_demi_journee'];      
     }
 
-    public function calculatePrice($birthdayVisitor, $reduction, $visitDuration){
+    public function calculatePrice($visitorBirthday, $reduction, $visitDuration){
 
         $dateDay = new \Datetime('today'); 
-        if($birthdayVisitor < $dateDay) $age = $birthdayVisitor->diff($dateDay)->y;
+       
+        if($visitorBirthday < $dateDay) $age = $visitorBirthday->diff($dateDay)->y;
+        //die(var_dump($age));
         else return 'false';
         
         if($reduction && $visitDuration === 1) return $this->fullPriceReduction;

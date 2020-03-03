@@ -3,17 +3,17 @@
 {% block title %}{% endblock %}
 
 {% block body %}
-
-{#{% for i in numberTickets %}   
+    {{ form_start(ticketForm) }}
+           
+        {{ form_end(ticketForm) }}
+{#{% for i in numberTickets.Ticket %}   
     
         {{ form_start(ticketForm) }}
            
         {{ form_end(ticketForm) }}
 
 {% endfor %}  #}
-    {{ form_start(ticketForm) }}
-           
-    {{ form_end(ticketForm) }}
+    
 {#<section>
 	<h3 class="major">Veuillez entrer les détails pour chaque visiteur</h3>
 		<form method="post" action="#">

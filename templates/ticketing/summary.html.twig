@@ -1,0 +1,13 @@
+<h1>Récapitulatif de commande</h1>
+
+<p>Numéro de commande : {{ orderCode }} </p>
+<p>Date de commande : {{ orderDate | date('d/m/Y') }}</p>
+
+<p>Durée de la visite : {{ visitDuration }} </p>
+<p>Nombre de billets : {{ numberTickets }}</p>
+<p>Prix total de la commande : {{ totalPrice }} </p>
+
+{{ price }}
+		
+<a href="/billetterie/paiement"class="btn btn-success">Payer</a>
+		
