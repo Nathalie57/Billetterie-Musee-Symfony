@@ -59,37 +59,19 @@ class TicketingController extends AbstractController
         ]);
     }
 
-        /**
+    /**
      * @Route("/billetterie", name="choice")
      */
-    public function choice(Request $request, User $user = null, SessionInterface $session, EntityManagerInterface $em)
+    public function choice(Request $request, User $user = null, SessionInterface $session, EntityManagerInterface $em, AuthorizedDate $authorizedDate)
 
-    {
-       // $session = new Session();
-        //$session->start();
-        
+    {       
         $user = new User();
         
         $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
 
         $user->setOrderCode(Uuid::uuid4());
-        $user->setOrderDate(date_create(), 'Y-M-d');
-    
-        /*$totalTicketsMax = 1000;
-        $rawSql = "SELECT `visitDate`, SUM(`ticketsNumber`) as totalTickets FROM `order` WHERE visitDate >= DATE_SUB(curdate(), INTERVAL 0 DAY)";
-    
-        $stmt = $em->getConnection()->prepare($rawSql);
-        $stmt->execute([]);
-    
-        $totalTickets = $stmt->fetchAll();
-        return $totalTickets;*/
-    
-       /* if($user->getVisitDate != null){
-            $okDateOrder = new AuthorizedDate($authorizedOrderDate, $authorizedVisitDate, $totalTickets)*/
-    
-        
-      // die(var_dump($form->isSubmitted()));
+        $user->setOrderDate(date_create(), 'Y-M-d');     
 
         if ($userForm->isSubmitted() && $userForm->isValid()) {          
             
@@ -101,14 +83,77 @@ class TicketingController extends AbstractController
 
             $session->set('currentUserId', $user->getId());
 
-            return $this->redirectToRoute('visitors_designation');
+            //Création d'un tableau des jours où le nombre de billets>1000
+            $rawSql = "SELECT `visit_date`, SUM(`number_tickets`) as totaltickets FROM `user` where visit_date > DATE_SUB(curdate(), INTERVAL 2 DAY) group by `visit_date` HAVING SUM(number_tickets) >= 1000";
+
+            $stmt = $em->getConnection()->prepare($rawSql);
+            $stmt->execute([]);
+
+            $result = $stmt->fetchAll();
+            $datesSoldOut = array();
+            
+            foreach ($result as $visit_date){
+                array_push($datesSoldOut, $visit_date["visit_date"]);
+            }
+
+            //On récupère la date, le nombre de billets et la durée de la visite
+            if($session->get('currentUserId')){  
+                $sessionUserId = $session->get('currentUserId');
+            }
+            $repository = $em->getRepository(User::class);
+            $currentUser = $repository->findOneBy(['id' => $sessionUserId]);
+          
+            $currentNumberTickets = $currentUser->getNumberTickets();
+            $currentVisitDate = $currentUser->getVisitDate();
+            $currentVisitDuration = $currentUser->getVisitDuration();
+
+            $canBuyTickets = true;
+
+            if($user->getVisitDate() != null)
+            {
+                //On regarde si on peut commander un billet pour ce jour et si le musée est ouvert
+                $authorizedDate = new AuthorizedDate();
+                $canBuyTickets = $authorizedDate->authorizedOrderDate($currentVisitDate, $currentVisitDuration);
+            //    $canBuyTickets .= $authorizedDate->authorizedVisitDate($currentVisitDate);
+            //    die(var_dump($canBuyTickets));
+                if($canBuyTickets)
+                {
+                    //Requête pour obtenir la somme des billets à une date donnée
+                    $rawSql = "SELECT `visit_date`, SUM(`number_tickets`) as totaltickets FROM `user` where date(visit_date) = date('".$user->getVisitDate()->format('Y-m-d')."') group by `visit_date`";
+                            
+                    $stmt = $em->getConnection()->prepare($rawSql);
+                    $stmt->execute([]);
+                
+                    $result = $stmt->fetchAll();
+                     //   die(var_dump($result));
+                    foreach ($result as $visit_date){
+                        if($user->getVisitDate()->format('Y-m-d') == $visit_date["visit_date"]) 
+                        {
+                            if(($visit_date["totaltickets"]+$user->getNumberTickets())>1000)
+                            {
+                                $canBuyTickets = false;
+                                //Afficher combien on peut acheter de billets
+                                $canBuyTicketsAmount = 1000 - $visit_date["totaltickets"];
+                            } 
+                        }
+                    }
+                }    
+            }
+            
+            if(!$canBuyTickets){
+                return $this->render('ticketing/orderError.html.twig', [ 
+                    'visitDate' => $currentVisitDate,
+                    ]);
+            }
+
+            else return $this->redirectToRoute('visitors_designation');
         }
     
         return $this->render('ticketing/choiceForm.html.twig', [ 
             'choiceForm' => $userForm->createView(),
             ]);
+    
     }
-
     /**
      * @Route("/billetterie/commande", name="visitors_designation")
      */

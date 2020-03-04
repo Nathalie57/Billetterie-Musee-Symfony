@@ -1,0 +1,13 @@
+{% extends 'base.html.twig'%}
+
+{% block body %}
+
+	<h1>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}</h1>
+  {#  {% if ...... %} Les dimanches et jours fériés ne sont pas ouverts à la réservation.
+    {% if ...... %} Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
+    {% else %} Tous les billets ont été vendus pour cette date.
+    {% endif %} #}
+	
+<a href="{{ path('home') }}">Retour</a>
+
+{% endblock %}

@@ -6,7 +6,7 @@ use App\Services\AuthorizedDate;
 use PHPUnit\Framework\TestCase;
 use \DateTime;
 
-class authorizedDateTest extends TestCase
+class AuthorizedDateTest extends TestCase
 {
     private $age;
     private $reduction;
@@ -14,26 +14,21 @@ class authorizedDateTest extends TestCase
 
     public function testDayBeforeOrder(){
         $dayBeforeOrder = new AuthorizedDate();
-        $this->assertSame('false', $dayBeforeOrder->authorizedOrderDate(new \Datetime('2020-02-10'), new \Datetime('2020-02-20'), 1));
+        $this->assertSame(false, $dayBeforeOrder->authorizedOrderDate(new \Datetime('2020-02-10'), 1));
     }
     
     public function testSundayOrder(){
         $sundayOrder = new AuthorizedDate();
-        $this->assertSame('false', $sundayOrder->authorizedOrderDate(new \Datetime('2021-02-07'), new \Datetime('2020-02-20'), 1));
+        $this->assertSame(false, $sundayOrder->authorizedOrderDate(new \Datetime('2021-05-17'), 1));
     }
 
     public function testOkDayOrder(){
         $okDayOrder = new AuthorizedDate();
-        $this->assertSame('true', $okDayOrder->authorizedOrderDate(new \Datetime('2020-02-27'), new \Datetime('2020-02-20'), 1));
+        $this->assertSame(true, $okDayOrder->authorizedOrderDate(new \Datetime('2020-04-08'), 1));
     }
 
     public function testAuthorizedVisitDay(){
         $authorizedVisitDay = new AuthorizedDate();
-        $this->assertSame('true', $authorizedVisitDay->authorizedVisitDate(new \Datetime('2020-02-25')));
+        $this->assertSame(false, $authorizedVisitDay->authorizedVisitDate(new \Datetime('2020-03-17')));
     }
-
-   /* public function testCountTickets(){
-        $countTickets = new AuthorizedDate();
-        $this->assertSame('false', $countTickets->countTickets(1200, new \Datetime('2020-02-25')));
-    }*/
 }

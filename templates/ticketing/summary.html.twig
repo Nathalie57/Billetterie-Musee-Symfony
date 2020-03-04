@@ -7,7 +7,11 @@
 <p>Nombre de billets : {{ numberTickets }}</p>
 <p>Prix total de la commande : {{ totalPrice }} </p>
 
-{{ price }}
+{% for i in numberTickets %}
+<p>Visiteur {{ i }}</p>
+<p>Nom et prénom : {{ clientName }}</p>
+<p>Prix du billet : {{ price }}</p>
+{% endfor %}
 		
 <a href="/billetterie/paiement"class="btn btn-success">Payer</a>
 		

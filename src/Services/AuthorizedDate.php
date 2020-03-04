@@ -3,13 +3,11 @@
 namespace App\Services;
 
 use Symfony\Component\Yaml\Yaml;
-use App\Repository\UserRepository;
 use \DateTime;
 
 class AuthorizedDate{
     
     private $holidays;
-    private $totalTickets;
 
     public function __construct() {
     
@@ -19,60 +17,69 @@ class AuthorizedDate{
             printf('Unable to parse the YAML string: %s', $exception->getMessage());
         }
 
-        $this->authorizedOrderDate = $value['jours_reservables'];
+        $this->closedDays = $value['jours_fermés'];
+        $this->offDays = $value['jours_feriés_fermés'];
 
-        $this->openedDays = $value['jours_ouverts'];
-        /*$this->monday = $value['jours_ouverts']['lundi'];
-        $this->tuesday = $value['jours_ouverts']['mardi'];
-        $this->wednesday = $value['jours_ouverts']['mercredi'];
-        $this->thursday = $value['jours_ouverts']['jeudi'];
-        $this->friday = $value['jours_ouverts']['vendredi'];
-        $this->saturday = $value['jours_ouverts']['samedi'];
-        $this->sunday = $value['jours_ouverts']['dimanche'];*/
-        
-        $this->closedDays = $value['jours_fermes'];
-
-        $this->setHolidays = $value['vacances'];
+        $this->offOrderDays = $value['jours_non_réservables'];
+        $this->offOrderHolidays = $value['jours_fériés'];
 
         $this->openingHour = $value['horaires']['ouverture'];
         $this->afternoon = $value['horaires']['apres_midi'];
         $this->closingHour = $value['horaires']['fermeture'];
-
-        $this->totalTicketsMax = $value['total_tickets_max'];
     }
 
-    public function calculateHolidays($date){
-        if ($date === null)
-	  	{
-	    	$date = time();
-	  	}
-
-	 	$date = strtotime(date('m/d/Y',$date));
-
-	 	$year = date('Y',$date);
-
-		$easterDate  = easter_date($year);
-		$easterDay   = date('j', $easterDate);
-		$easterMonth = date('n', $easterDate);
-		$easterYear   = date('Y', $easterDate);
-
-		$holidays = array(
-	    
-	    mktime(0, 0, 0, $easterMonth, $easterDay + 1,  $easterYear), //lundi de Pâques
-	    mktime(0, 0, 0, $easterMonth, $easterDay + 39, $easterYear), //ascension
-	    mktime(0, 0, 0, $easterMonth, $easterDay + 50, $easterYear), //lundi de Pentecôte
-		);
+    private function calculateOffDays($currentDate)
+    {
+        $currentYear = $currentDate->format("Y");   
+        $currentDay = $currentDate->format("j");  
+        $currentMonth = $currentDate->format("m");  
         
-        return $holidays;
-	} 
-    
-    public function authorizedOrderDate($visitDate, $orderDate, $visitDuration){
+        $easterDate  = easter_date($currentYear);
+        $easterDay   = date('j', $easterDate);
+        $easterMonth = date('n', $easterDate);
+        $easterYear   = date('Y', $easterDate);
 
-        $orderDate = new Datetime();
+        $calculatedOffDays = array(
+            \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 1+1).'-'.$currentYear),
+            \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 39+1).'-'.$currentYear),
+            \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 50+1).'-'.$currentYear),
+            );
+        
+       // $this->notWorkingDays = $calculatedOffDays ;
+    }
+
+    public function authorizedVisitDate($visitDate){
+
+        $day = $visitDate->format("w");
+        if(in_array($day, $this->closedDays)){
+            return false;
+        }
+        
+        foreach ($this->offDays as $value){
+            if($value->format("j") == $visitDate->format("j") && $value->format("m") == $visitDate->format("m")){ 
+                return false;
+            }
+        }
+    }
+    
+    public function authorizedOrderDate($visitDate, $visitDuration){
+
+        $orderDate = new \DateTime('today');
+        $orderDate =  \DateTime::createFromFormat('Y-m-d', date_format($orderDate, 'Y-m-d'));
+        
         $visitDate = new Datetime();
 
         //on regarde si le jour de visite est autorisé à la réservation
-        if($visitDate = $this->holidays || $visitDate = $this->setHolidays || $visitDate = $this->authorizedOrderDate = false) return false;
+        $day = $visitDate->format("w");
+        if(in_array($day, $this->offOrderDays)){
+            return false;
+        }
+        
+        foreach ($this->offOrderHolidays as $value){
+            if($value->format("j") == $visitDate->format("j") && $value->format("m") == $visitDate->format("m")){ 
+                return false;
+            }
+        }
             
         if($visitDate>$orderDate) return true;
 
@@ -87,13 +94,5 @@ class AuthorizedDate{
                                                
             else return 'true';
         }            
-    }  
-
-    public function authorizedVisitDate($visitDate){
-
-        $visitDate = new Datetime();
-
-        if($visitDate = $this->openedDays = true || $visitDate != $this->closedDays) return true;
-        else return false;
-    }
+    }   
 }
