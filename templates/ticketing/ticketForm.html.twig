@@ -3,16 +3,24 @@
 {% block title %}{% endblock %}
 
 {% block body %}
-    {{ form_start(ticketForm) }}
-           
-        {{ form_end(ticketForm) }}
-{#{% for i in numberTickets.Ticket %}   
-    
-        {{ form_start(ticketForm) }}
-           
-        {{ form_end(ticketForm) }}
+  
+{#<form action="" method="POST" data-qty="{{numberTickets}}" id="formToComplete">
+<input type="submit">
+</form>#}
 
-{% endfor %}  #}
+{{ form_start(form_collection) }}
+
+{{ form_end(form_collection) }}
+
+    
+{#{% for numberTickets in ticket.numberTickets %}    
+	{{ form_row(ticket.visitorName, {'attr':{"value":""}}) }}</br>
+	{{ form_row(ticketForm.visitorBirthday, {'attr':{"value":""}}) }}</br>
+	{{ form_row(ticketForm.country, {'attr':{"value":""}}) }}</br>
+	{{ form_row(ticketForm.reduction) }}</br>
+{% endfor %}#}
+    
+
     
 {#<section>
 	<h3 class="major">Veuillez entrer les détails pour chaque visiteur</h3>
@@ -50,4 +58,9 @@
 		</form>
 	</section>#}
 
+{% endblock %}
+
+{% block javascripts %}
+<script src="/js/ticketForm.js"></script>
+<script src="/js/runForm.js" defer></script>
 {% endblock %}

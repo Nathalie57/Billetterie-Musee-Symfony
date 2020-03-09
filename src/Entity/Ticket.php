@@ -69,7 +69,7 @@ class Ticket
         return $this->visitorBirthday;
     }
 
-    public function setVisitorBirthday(\DateTimeInterface $visitorBirthday): self
+    public function setVisitorBirthday(?\DateTimeInterface $visitorBirthday): self
     {
         $this->visitorBirthday = $visitorBirthday;
 

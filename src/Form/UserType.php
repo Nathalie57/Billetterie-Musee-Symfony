@@ -34,7 +34,9 @@ class UserType extends AbstractType
                     '10'  => 10
                 ],
             ])
-            ->add('visitDate', DateType::class, ['label' => 'Date de la visite'])
+            ->add('visitDate', DateType::class, [
+                'label' => 'Date de la visite',
+                'widget' => 'single_text'])
             ->add('visitDuration', ChoiceType::class, [
                 'label'   => 'Durée de la visite',
                 'choices' => [

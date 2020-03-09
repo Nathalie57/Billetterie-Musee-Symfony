@@ -3,7 +3,10 @@
 <p>Numéro de commande : {{ orderCode }} </p>
 <p>Date de commande : {{ orderDate | date('d/m/Y') }}</p>
 
-<p>Durée de la visite : {{ visitDuration }} </p>
+<p>Durée de la visite : 
+{% if visitDuration == 1 %} Journée
+{% else %} Demi-journée</p>
+{% endif %}
 <p>Nombre de billets : {{ numberTickets }}</p>
 <p>Prix total de la commande : {{ totalPrice }} </p>
 
@@ -12,6 +15,7 @@
 <p>Nom et prénom : {{ clientName }}</p>
 <p>Prix du billet : {{ price }}</p>
 {% endfor %}
-		
+
+<p>Merci de vérifier les informations avant de procéder au paiement<p>
 <a href="/billetterie/paiement"class="btn btn-success">Payer</a>
 		
