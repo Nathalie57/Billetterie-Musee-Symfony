@@ -4,47 +4,62 @@
 
 {% block body %}
 
-<div id="main">
+<body class="is-preload">
 
-	<!-- Intro -->
-		<article id="intro">
-			<h2 class="major">{{ title }}</h2>
-			<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
-			<section>
-				<h3 class="major">Horaires</h3>
-					<div class="table-wrapper">
-						<table>
-							<tbody>
-								<tr>
-									<td>Lundi</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>
-								<tr>
-									<td>Mardi</td>
-									<td>Fermé</td>
-								</tr>
-								<tr>
-									<td>Mercredi</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>
-								<tr>
-									<td>Jeudi</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>
-								<tr>
-									<td>Vendredi</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>
-								<tr>
-									<td>Samedi</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>	
-								<tr>
-									<td>Dimanche</td>
-									<td>{{ ouverture }}h - {{ fermeture }}h</td>
-								</tr>		
-							</tbody>
-						</table>
-					</div>					
-		</article>				
+	<div id="wrapper">
+
+		<nav id="nav">
+			<a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+			<a href="{{ path('opening_hours') }}" class="icon solid fa-clock active"><span>Les horaires</span></a>
+			<a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+			<a href="{{ path('choice') }}" class="icon solid fa-ticket-alt"><span>Réservation</span></a>
+		</nav>
+
+	<div id="main">
+			
+		<article id="horaires" class="panel">
+			<header>
+				<h2>{{ title }}</h2>
+			</header>
+				
+			<div class="table-wrapper">
+				<table>
+					<tbody>
+						<tr>
+							<td>Lundi</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>
+						<tr>
+							<td>Mardi</td>
+							<td>Fermé</td>
+						</tr>
+						<tr>
+							<td>Mercredi</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>
+						<tr>
+							<td>Jeudi</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>
+						<tr>
+							<td>Vendredi</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>
+						<tr>
+							<td>Samedi</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>	
+						<tr>
+							<td>Dimanche</td>
+							<td>{{ ouverture }}h - {{ fermeture }}h</td>
+						</tr>		
+					</tbody>
+				</table>
+			</div>
+			
+		<a href="tarifs" class="jumplink pic">
+			<span class="arrow icon solid fa-chevron-right"><span>Voir les tarifs</span></span>	
+		</a>
+	</article>
+			
 {% endblock %}

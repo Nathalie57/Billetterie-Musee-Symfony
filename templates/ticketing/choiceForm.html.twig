@@ -4,43 +4,30 @@
 
 {% block body %}
 
+<body class="is-preload">
+
+	<div id="wrapper">
+
+		<nav id="nav">
+			<a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+			<a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+			<a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+			<a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+		</nav>
+
+	<div id="main">
+			
+		<article id="billetterie" class="panel">
+			<header>
+				<h2>{{ title }}</h2>
+			</header>
 {{ form_start(choiceForm) }}
 
 {{ form_end(choiceForm) }}
 
-{#<section>
-	<h3 class="major">Choix des billets</h3>
-		<form method="post" action="">
-			<div class="fields">
-                <div class="field">
-					<label for="ticketsNumber">Nombre de billets</label>
-					<select name="ticketsNumber" id="ticketsNumber">
-						<option value="">--Choisissez un nombre de billet</option>
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-					</select>
-				</div>
-                <div class="field half">
-                    <label for="visitDate">Date de la visite</label>
-                    <input type="date" name="visitDate" id="visitDate" value=""/>
-                </div>
-				<div class="field half">
-					<input type="checkbox" id="day" name="day">
-					<label for="day">Journée</label>
-                    <input type="checkbox" id="halfDay" name="halfDay">
-                    <label for="halfDay">Demi-journée</label>
-                </div>            											
-				<ul class="actions">
-					<input type="submit" value="Valider" class="primary" />
-				</ul>
-		</form>
-	</section>#}
+		</article>
+	</div>
+	</div>
+</body>
 
 {% endblock %}

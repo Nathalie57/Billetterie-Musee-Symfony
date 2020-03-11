@@ -28,7 +28,8 @@ class TicketingController extends AbstractController
     public function index()
     {
         return $this->render('ticketing/index.html.twig', [
-            'title' => '',
+            'title' => 'Billetterie du Louvre',
+            'paragraph' => 'Achetez vos billets en toute simplicité !'
         ]);
     }
 
@@ -37,7 +38,7 @@ class TicketingController extends AbstractController
      */
     public function showOpeningHours(AuthorizedDate $authorizedDate){
         return $this->render('ticketing/showOpeningHours.html.twig', [
-            'title'     => 'Ouverture',
+            'title'     => 'Horaires et jours d\'ouverture',
             'ouverture' => $authorizedDate->openingHour,
             'fermeture' => $authorizedDate->closingHour
         ]);
@@ -156,6 +157,7 @@ class TicketingController extends AbstractController
     
         return $this->render('ticketing/choiceForm.html.twig', [ 
             'choiceForm' => $userForm->createView(),
+            'title' => 'Choix des billets'
             ]);
     
     }
@@ -236,6 +238,7 @@ die(var_dump($ticket->getIdOrder()));
  
 		return $this->render('ticketing/ticketForm.html.twig', [
             'form_collection' => $formCollection->createView(),
+            'title' => 'Détail de chaque visiteur',
             'numberTickets' => $currentUser->getNumberTickets()
 		]);    
     }

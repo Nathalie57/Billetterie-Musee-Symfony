@@ -49,7 +49,7 @@ class UserType extends AbstractType
             ->add('clientCountry', CountryType::class, ['label' => 'Pays'])
             ->add('clientEmail', EmailType::class, ['label' => 'Email'])
             
-            ->add('save', SubmitType::class)
+            ->add('Valider', SubmitType::class)
         ;
     }
 

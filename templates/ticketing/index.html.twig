@@ -4,34 +4,32 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<body>
         
-        <body class="is-preload">
+    <body class="is-preload">
 
-		<!-- Wrapper -->
-			<div id="wrapper">
+	<div id="wrapper">
 
-				<!-- Header -->
-					<header id="header">
-						<div class="logo">
-							<span class="icon fa-gem"></span>
-						</div>
-						<div class="content">
-							<div class="inner">
-								<h1>Billetterie du Musée du Louvre</h1>
-								<p>Réservez facilement vos billets pour visiter le Musée !</p>
-							</div>
-						</div>
-						<nav>
-							<ul>
-								<li><a href="{{ path('opening_hours') }}">Les horaires</a></li>
-								<li><a href="{{ path('price') }}">Les tarifs</a></li>
-								<li><a href="{{ path('choice') }}">Réservation</a></li>
-								<li><a href="#contact">Contact</a></li>
-							</ul>
-						</nav>
-					</header>
-    <h1>{{ title }}</h1>
+		<nav id="nav">
+			<a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+			<a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+			<a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+			<a href="{{ path('choice') }}" class="icon solid fa-ticket-alt"><span>Réservation</span></a>
+		</nav>
+	
+    <div id="main">
+
+		<article id="home" class="panel intro">
+			<header>
+				<h1>{{ title }}</h1>
+				<p>{{ paragraph }}</p>
+			</header>
+			<a href="horaires" class="jumplink pic">
+				<span class="arrow icon solid fa-chevron-right"><span>Voir les horaires</span></span>
+				<img src="images/monalisa.jpg" alt="" />
+			</a>
+		</article>
+
+		
 
   
 {% endblock %}

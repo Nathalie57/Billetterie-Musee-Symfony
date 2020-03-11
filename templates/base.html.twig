@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Billetterie du Louvre{% endblock %}</title>
+        <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{{ asset('assets/css/main.css') }}" />
+		<noscript><link rel="stylesheet" href="{{ asset('assets/css/noscript.css') }}" /></noscript>
         {% block stylesheets %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+       
     </head>
-    <body>
-        {% block body %}{% endblock %}
-        
-    </body>
+     {% block body %}{% endblock %}
+        <script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+    
+     {% block javascripts %}{% endblock %}
 </html>
