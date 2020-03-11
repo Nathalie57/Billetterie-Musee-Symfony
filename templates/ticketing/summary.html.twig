@@ -2,6 +2,7 @@
 
 <p>Numéro de commande : {{ orderCode }} </p>
 <p>Date de commande : {{ orderDate | date('d/m/Y') }}</p>
+<p>Date de la visite : {{ visitDate | date('d/m/y') }}</p>
 
 <p>Durée de la visite : 
 {% if visitDuration == 1 %} Journée

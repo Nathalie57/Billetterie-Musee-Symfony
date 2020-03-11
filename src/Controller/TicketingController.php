@@ -162,7 +162,7 @@ class TicketingController extends AbstractController
     /**
      * @Route("/billetterie/commande", name="visitors_designation")
      */
-    public function visitorsDesignation(EntityManagerInterface $em, Request $request, User $user = null, Ticket $ticket = null, SessionInterface $session){
+    public function visitorsDesignation(EntityManagerInterface $em, Request $request, User $user = null, Ticket $ticket = null, CalculatePrice $calculatePrice, SessionInterface $session){
         
         if($session->get('currentUserId')){  
             $sessionUserId = $session->get('currentUserId');
@@ -197,9 +197,23 @@ class TicketingController extends AbstractController
         $ticketArray= $this->getDoctrine()->getRepository(Ticket::class)->findBy(['idOrder'=>$currentIdOrder]);
 		$formCollection = $this->createForm(TicketCollectionType ::class, ['TicketCollection' => $ticketArray]);
  
-		$formCollection->handleRequest($request);
+        $formCollection->handleRequest($request);
+       
 		if ($formCollection->isSubmitted() && $formCollection->isValid()) {
             $submittedTicketArray= $formCollection->getData();
+          //  die(var_dump($submittedTicketArray));
+         /*   $data = array(
+                //"birthday" => $submittedTicketArray['visitorBirthday'],
+                "reduction" => $submittedTicketArray->getReduction(),
+                "visitDuration" => $submittedTicketArray->getVisitDuration()
+            );*/
+
+         /* foreach ($submittedTicketArray as $currentTicket) {
+                               
+                $calculatePrice = New CalculatePrice();
+                $this->price = $calculatePrice->calculatePrice($this->visitorBirthday, $this->reduction, $this->visitDuration);
+            }*/
+
             $em = $this->getDoctrine()->getManager();
         
             foreach($em as $tickets){
@@ -208,35 +222,45 @@ class TicketingController extends AbstractController
 
             $em->flush();
 
+            $session->set('currentIdOrder', $ticket->getIdOrder());           
+die(var_dump($ticket->getIdOrder()));
+            //On récupère l'idOrder des tickets
+            if($session->get('currentIdOrder')){  
+                $sessionIdOrder = $session->get('currentIdOrder');
+            }
+            $repository = $em->getRepository(Ticket::class);
+            $currentOrder = $repository->findOneBy(['idOrder' => $sessionIdOrder]);
+
             return $this->redirectToRoute('paiement');
 		}
  
 		return $this->render('ticketing/ticketForm.html.twig', [
-			'form_collection' => $formCollection ->createView(),
+            'form_collection' => $formCollection->createView(),
+            'numberTickets' => $currentUser->getNumberTickets()
 		]);    
     }
 
     /**
      * @Route("/billetterie/paiement", name="paiement")
      */ 
-    public function paiement(EntityManagerInterface $em, User $user=null, Request $request, SessionInterface $session){
+    public function paiement(EntityManagerInterface $em, Request $request, SessionInterface $session){
         
         if($session->get('currentUserId')){  
             $currentUserId = $session->get('currentUserId');
         }
 
-        $repository = $em->getRepository(User::class);
-        $currentUser = $repository->findOneBy(['id' => $currentUserId]);
-
-        if($session->get('currentTicketId')){  
-            $currentTicketId = $session->get('currentTicketId');
+      //  $repository = $em->getRepository(User::class);
+      //  $currentUser = $repository->findOneBy(['id' => $currentUserId]);
+        
+        if($session->get('currentIdOrder')){  
+            $currentIdOrder = $session->get('currentIdOrder');
         }
 
         $repository = $em->getRepository(Ticket::class);
-        $currentTicket = $repository->findOneBy(['id' => $currentTicketId]);
+        $currentOrder = $repository->findOneBy(['idOrder' => $currentIdOrder]);
   
-        if (!$currentUser) {
-            throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentUserId));
+        if (!$currentOrder) {
+            throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
         }
 
         $this->orderCode = $currentUser->getOrderCode();
@@ -252,11 +276,11 @@ class TicketingController extends AbstractController
         $this->birthday = $currentTicket->getVisitorBirthday();
         $this->reduction = $currentTicket->getReduction();
         $this->country = $currentTicket->getCountry();
-        
+        die(var_dump($this->country));
        // if($this->numberTickets==0){
        //     for ($i = 1; $i <= $this->numberTickets; $i++) {
-        $calculatePrice = New CalculatePrice();
-        $this->price = $calculatePrice->calculatePrice($this->birthday, $this->reduction, $this->visitDuration);
+        //$calculatePrice = New CalculatePrice();
+        //$this->price = $calculatePrice->calculatePrice($this->birthday, $this->reduction, $this->visitDuration);
        // $ticket->setPrice();
         // die(var_dump($this->price));
          //   }
@@ -267,6 +291,7 @@ class TicketingController extends AbstractController
         return $this->render('ticketing/summary.html.twig', [
             'orderCode' => $this->orderCode,
             'orderDate' => $this->orderDate,
+            'visitDate' => $this->visitDate,
             'visitDuration' => $this->visitDuration,
             'totalPrice' => $this->totalPrice,
             'numberTickets' => $this->numberTickets,
@@ -276,7 +301,7 @@ class TicketingController extends AbstractController
             'birthday'  => $this->birthday,
             'reduction' => $this->reduction,
             'country'   => $this->country,
-            'price'     => $this->price
+          //  'price'     => $this->price
             ]);
     }
 }
