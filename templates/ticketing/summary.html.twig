@@ -1,4 +1,4 @@
-<h1>Récapitulatif de commande</h1>
+<h1>{{ title }}</h1>
 
 <p>Numéro de commande : {{ orderCode }} </p>
 <p>Date de commande : {{ orderDate | date('d/m/Y') }}</p>
@@ -11,11 +11,11 @@
 <p>Nombre de billets : {{ numberTickets }}</p>
 <p>Prix total de la commande : {{ totalPrice }} </p>
 
-{% for i in numberTickets %}
-<p>Visiteur {{ i }}</p>
-<p>Nom et prénom : {{ clientName }}</p>
+{#{% for i in numberTickets %}
+<p>Visiteur {{ i }}</p>#}
+<p>Nom et prénom : {{ name }}</p>
 <p>Prix du billet : {{ price }}</p>
-{% endfor %}
+{#{% endfor %}#}
 
 <p>Merci de vérifier les informations avant de procéder au paiement<p>
 <a href="/billetterie/paiement"class="btn btn-success">Payer</a>

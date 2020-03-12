@@ -1,13 +1,35 @@
 {% extends 'base.html.twig'%}
 
 {% block body %}
+ 
+    <body class="is-preload">
+        <div id="wrapper">
+            <nav id="nav">
+                <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+                <a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+                <a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+                <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+		    </nav>
 
-	<h1>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}</h1>
-  {#  {% if ...... %} Les dimanches et jours fériés ne sont pas ouverts à la réservation.
-    {% if ...... %} Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
-    {% else %} Tous les billets ont été vendus pour cette date.
-    {% endif %} #}
-	
-<a href="{{ path('home') }}">Retour</a>
+        <div id="main">
+            <article id="billetterie" class="panel">
+            
+                <p>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}.</p>
+                {% if dateFalse %} Les dimanches et jours fériés ne sont pas ouverts à la réservation.<br/>
+                Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
+                {% else %} Tous les billets ont été vendus pour cette date.
+                {% endif %}
+                <br/>
+                <br/>
+
+                <form action="{{ path('choice') }}">
+                    <button type="submit">Retour à la billetterie</button>
+                </form>
+
+	        </article>
+	    </div>
+	    </div>
+    </body>
 
 {% endblock %}
+

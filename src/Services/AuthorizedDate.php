@@ -17,40 +17,48 @@ class AuthorizedDate{
             printf('Unable to parse the YAML string: %s', $exception->getMessage());
         }
 
-        $this->closedDays = $value['jours_fermés'];
-        $this->offDays = $value['jours_feriés_fermés'];
-
-        $this->offOrderDays = $value['jours_non_réservables'];
-        $this->offOrderHolidays = $value['jours_fériés'];
-
+        $this->closedDays = $value['jours_fermes'];
+        $this->offOrderHolidays = $value['jours_feries'];
+        
+        $this->offOrderDays     = $value['jours_non_réservables'];
+        
         $this->openingHour = $value['horaires']['ouverture'];
-        $this->afternoon = $value['horaires']['apres_midi'];
+        $this->afternoon   = $value['horaires']['apres_midi'];
         $this->closingHour = $value['horaires']['fermeture'];
+
+        /********* probablement inutiles ********/
+        $this->offDays    = $value['jours_feriés_fermés'];
     }
 
     private function calculateOffDays($currentDate)
     {
-        $currentYear = $currentDate->format("Y");   
-        $currentDay = $currentDate->format("j");  
+        $currentDate = new \DateTime('today');
+        
+        $currentYear  = $currentDate->format("Y");   
+        $currentDay   = $currentDate->format("j");  
         $currentMonth = $currentDate->format("m");  
         
         $easterDate  = easter_date($currentYear);
         $easterDay   = date('j', $easterDate);
         $easterMonth = date('n', $easterDate);
-        $easterYear   = date('Y', $easterDate);
+        $easterYear  = date('Y', $easterDate);
 
         $calculatedOffDays = array(
             \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 1+1).'-'.$currentYear),
             \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 39+1).'-'.$currentYear),
             \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 50+1).'-'.$currentYear),
-            );
+        );
+
+        if (in_array ($calculatedOffDays,$this->currentDate)) return false;
+        return true;
         
        // $this->notWorkingDays = $calculatedOffDays ;
     }
 
-    public function authorizedVisitDate($visitDate){
+   /* public function authorizedVisitDate($visitDate){
 
         $day = $visitDate->format("w");
+        die(var_dump($day));
         if(in_array($day, $this->closedDays)){
             return false;
         }
@@ -60,28 +68,29 @@ class AuthorizedDate{
                 return false;
             }
         }
-    }
+    }*/
     
     public function authorizedOrderDate($visitDate, $visitDuration){
 
         $orderDate = new \DateTime('today');
         $orderDate =  \DateTime::createFromFormat('Y-m-d', date_format($orderDate, 'Y-m-d'));
         
-        $visitDate = new Datetime();
+        // $visitDate = new Datetime();
 
         //on regarde si le jour de visite est autorisé à la réservation
         $day = $visitDate->format("w");
-        if(in_array($day, $this->offOrderDays)){
-            return false;
-        }
+
+        if ($this->closedDays[$day]) return false;
+        $refDate = $visitDate->format("j")."/".$visitDate->format("m");
         
         foreach ($this->offOrderHolidays as $value){
-            if($value->format("j") == $visitDate->format("j") && $value->format("m") == $visitDate->format("m")){ 
-                return false;
-            }
+            if($value === $refDate) return false;
         }
+
+     //   if ( ! $this->calculateOffDays($visitDate)) return false;
             
         if($visitDate>$orderDate) return true;
+
 
         if($visitDate===$orderDate){
             //on récupère l'heure

@@ -1,16 +1,16 @@
-jours_fermés :
-  0 : false
-  1 : true
-  2 : false
+jours_fermes :
+  0 : true   #dimanche
+  1 : false  #lundi
+  2 : true   #mardi
   3 : false
   4 : false
   5 : false
   6 : false
 
 jours_feriés_fermés : 
-  -1/1
-  -1/11
-  -25/12
+  - 1/1
+  - 1/11
+  - 25/12
 
 jours_non_réservables :
   lundi : false
@@ -21,15 +21,15 @@ jours_non_réservables :
   samedi : false
   dimanche : true
 
-jours_fériés :
-  -1/1
-  -1/5
-  -8/5
-  -14/7
-  -15/8
-  -1/11
-  -11/11
-  -25/12
+jours_feries :
+  - 01/01
+  - 01/05
+  - 08/05
+  - 14/07
+  - 15/08
+  - 01/11
+  - 11/11
+  - 25/12
 
 horaires :
   ouverture : 8

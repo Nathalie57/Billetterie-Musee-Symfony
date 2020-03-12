@@ -1,58 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% endblock %}
-
 {% block body %}
- 
+
 {#<form action="" method="POST" data-qty="{{numberTickets}}" id="formToComplete">
 <input type="submit">
 </form>#}
 
-{{ form_start(form_collection) }}
+<div id="wrapper">
+    <nav id="nav">
+        <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+        <a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+        <a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+        <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+	</nav>
+    <div id="main">
+        <article id="billetterie" class="panel">
+            {{ form_start(form_collection) }}
 
-{{ form_end(form_collection) }}
-
-
-    
-{#<section>
-	<h3 class="major">Veuillez entrer les détails pour chaque visiteur</h3>
-		<form method="post" action="#">
-			{% for order in ticketsNumber %}
-                <div class="fields">
-                    <div class="field half">
-                        <label for="firstNameVisitor">Nom</label>
-                        <input type="text" name="firstNameVisitor" id="firstNameVisitor" value=""/>
-                    </div>
-                    <div class="field half">
-                        <label for="lastNameVisitor">Prénom</label>
-                        <input type="text" name="lastNameVisitor" id="lastNameVisitor" value=""/>
-                    </div>
-                    <div class="field half">
-				        <label for="country">Pays</label>
-					    <input type="text" name="country" id="country" value=""/>
-				    </div>
-                    <div class="field half">
-                        <label for="birthdayVisitor">Date de naissance</label>
-                        <input type="date" name="birthdayVisitor" id="birthdayVisitor" value=""/>
-                    </div>
-                    <div class="field half">
-						<input type="checkbox" id="reduction" name="reduction">
-						<label for="reduction">Tarif réduit</label>
-                        <p>Un justificatif (carte étudiant, carte militaire, etc.) pourra vous être demandé lors de votre entrée au musée.
-						</div>
-                    
-                </div>
-            {% endfor %}
-            											
-				<ul class="actions">
-					<input type="submit" value="Valider" class="primary" />
-				</ul>
-		</form>
-	</section>#}
+            {{ form_end(form_collection) }}
+        </article>
+    </div>
+</div>
 
 {% endblock %}
 
-{% block javascripts %}
+{#{% block javascripts %}
 <script src="/js/ticketForm.js"></script>
 <script src="/js/runForm.js" defer></script>
-{% endblock %}
+{% endblock %}#}
