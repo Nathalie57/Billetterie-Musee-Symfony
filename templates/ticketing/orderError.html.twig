@@ -15,7 +15,7 @@
             <article id="billetterie" class="panel">
             
                 <p>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}.</p>
-                {% if dateFalse %} Les dimanches et jours fériés ne sont pas ouverts à la réservation.<br/>
+                {% if dateFalse %} Les dimanches, les jours fériés et les jours passés ne sont pas ouverts à la réservation.<br/>
                 Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
                 {% else %} Tous les billets ont été vendus pour cette date.
                 {% endif %}

@@ -19,15 +19,14 @@ class AuthorizedDate{
 
         $this->closedDays = $value['jours_fermes'];
         $this->offOrderHolidays = $value['jours_feries'];
-        
-        $this->offOrderDays     = $value['jours_non_réservables'];
-        
+                
         $this->openingHour = $value['horaires']['ouverture'];
         $this->afternoon   = $value['horaires']['apres_midi'];
         $this->closingHour = $value['horaires']['fermeture'];
 
         /********* probablement inutiles ********/
-        $this->offDays    = $value['jours_feriés_fermés'];
+       // $this->offDays    = $value['jours_feriés_fermés'];
+       // $this->offOrderDays     = $value['jours_non_réservables'];
     }
 
     private function calculateOffDays($currentDate)
@@ -49,33 +48,13 @@ class AuthorizedDate{
             \DateTime::createFromFormat('m-j-Y', $easterMonth.'-'.($easterDay + 50+1).'-'.$currentYear),
         );
 
-        if (in_array ($calculatedOffDays,$this->currentDate)) return false;
-        return true;
-        
-       // $this->notWorkingDays = $calculatedOffDays ;
+        $this->offDays = $calculatedOffDays;       
     }
-
-   /* public function authorizedVisitDate($visitDate){
-
-        $day = $visitDate->format("w");
-        die(var_dump($day));
-        if(in_array($day, $this->closedDays)){
-            return false;
-        }
-        
-        foreach ($this->offDays as $value){
-            if($value->format("j") == $visitDate->format("j") && $value->format("m") == $visitDate->format("m")){ 
-                return false;
-            }
-        }
-    }*/
     
     public function authorizedOrderDate($visitDate, $visitDuration){
 
         $orderDate = new \DateTime('today');
         $orderDate =  \DateTime::createFromFormat('Y-m-d', date_format($orderDate, 'Y-m-d'));
-        
-        // $visitDate = new Datetime();
 
         //on regarde si le jour de visite est autorisé à la réservation
         $day = $visitDate->format("w");
@@ -87,10 +66,12 @@ class AuthorizedDate{
             if($value === $refDate) return false;
         }
 
-     //   if ( ! $this->calculateOffDays($visitDate)) return false;
-            
+        $this->calculateOffDays($visitDate);
+        foreach ($this->offDays as $value){
+            if($value->format("j") == $visitDate->format("j") && $value->format("m") == $visitDate->format("m")) return false;
+        }
+       
         if($visitDate>$orderDate) return true;
-
 
         if($visitDate===$orderDate){
             //on récupère l'heure

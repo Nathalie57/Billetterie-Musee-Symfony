@@ -7,20 +7,6 @@ jours_fermes :
   5 : false
   6 : false
 
-jours_feriés_fermés : 
-  - 1/1
-  - 1/11
-  - 25/12
-
-jours_non_réservables :
-  lundi : false
-  mardi : true
-  mercredi : false
-  jeudi : false
-  vendredi : false
-  samedi : false
-  dimanche : true
-
 jours_feries :
   - 01/01
   - 01/05
