@@ -1,0 +1,27 @@
+{% extends 'base.html.twig'%}
+
+{% block body %}
+ 
+    
+        <div id="wrapper">
+            <nav id="nav">
+                <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+                <a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+                <a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+                <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+		    </nav>
+
+        <div id="main">
+            <article id="billetterie" class="panel">
+                <p>La date de naissance n'est pas valide.</p>
+            
+                <form action="{{ path('visitors_designation') }}">
+                    <button type="submit">Retour</button>
+                </form>
+
+	        </article>
+	    </div>
+	    </div>
+    </body>
+
+{% endblock %}

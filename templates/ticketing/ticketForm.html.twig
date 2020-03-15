@@ -2,9 +2,7 @@
 
 {% block body %}
 
-{#<form action="" method="POST" data-qty="{{numberTickets}}" id="formToComplete">
-<input type="submit">
-</form>#}
+
 
 <div id="wrapper">
     <nav id="nav">
@@ -15,16 +13,23 @@
 	</nav>
     <div id="main">
         <article id="billetterie" class="panel">
+            
             {{ form_start(form_collection) }}
 
             {{ form_end(form_collection) }}
+            
+{#<form action="" method="POST" data-qty="{{numberTickets}}" id="formToComplete">
+<input type="submit">
+</form>#}
+
         </article>
     </div>
 </div>
 
+
 {% endblock %}
 
-{#{% block javascripts %}
+{% block javascripts %}
 <script src="/js/ticketForm.js"></script>
 <script src="/js/runForm.js" defer></script>
-{% endblock %}#}
+{% endblock %}

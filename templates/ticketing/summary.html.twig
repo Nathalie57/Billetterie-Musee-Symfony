@@ -1,22 +1,50 @@
-<h1>{{ title }}</h1>
+{% extends 'base.html.twig'%}
 
-<p>Numéro de commande : {{ orderCode }} </p>
-<p>Date de commande : {{ orderDate | date('d/m/Y') }}</p>
-<p>Date de la visite : {{ visitDate | date('d/m/y') }}</p>
+{% block body %}
+ 
+    
+        <div id="wrapper">
+            <nav id="nav">
+                <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+                <a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+                <a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+                <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+		    </nav>
 
-<p>Durée de la visite : 
-{% if visitDuration == 1 %} Journée
-{% else %} Demi-journée</p>
-{% endif %}
-<p>Nombre de billets : {{ numberTickets }}</p>
-<p>Prix total de la commande : {{ totalPrice }} </p>
+        <div id="main">
+            <article id="billetterie" class="panel">
+                <h2>{{ title }}</h2><br/>
+                <h4>Merci de vérifier les informations avant de procéder au paiement.</h4><br/>
 
-{#{% for i in numberTickets %}
-<p>Visiteur {{ i }}</p>#}
-<p>Nom et prénom : {{ name }}</p>
-<p>Prix du billet : {{ price }}</p>
-{#{% endfor %}#}
+                <p>Numéro de commande : {{ orderCode }} <br/>
+                {#Date de commande : {{ orderDate | date('d/m/Y') }}<br/>#}
+                Date de la visite : {{ visitDate | date('d/m/y') }}<br/>
 
-<p>Merci de vérifier les informations avant de procéder au paiement<p>
-<a href="/billetterie/paiement"class="btn btn-success">Payer</a>
-		
+                Durée de la visite : 
+                {% if visitDuration == 1 %} Journée<br/>
+                {% else %} Demi-journée<br/>
+                {% endif %}
+                Nombre de billets : {{ numberTickets }}<br/>
+                Prix total de la commande : {{ totalPrice }}<br/>
+                Nom et prénom du client : {{ clientName }}<br/>
+                Adresse du client : {{ address }}<br/>
+                Email du client : {{ email }} </p>
+
+                {% for i in 1..numberTickets %}
+                <p>Visiteur n°{{ i }}</br>>
+                Nom et prénom : {{ name }}</br>>
+                Prix du billet : {{ price }}€</p>
+                {% endfor %}</br>
+
+                <form action="{{ path('paiement') }}">
+                    <button type="submit">Payer la commande</button>
+                </form>
+                
+
+</article>
+	    </div>
+	    </div>
+    </body>
+
+{% endblock %}
+
