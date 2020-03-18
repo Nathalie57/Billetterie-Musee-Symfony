@@ -37,20 +37,26 @@ class CalculatePrice{
     public function calculatePrice($visitorBirthday, $reduction, $visitDuration){
 
         $dateDay = new \Datetime('today'); 
-       
-        if($visitorBirthday < $dateDay) $age = $visitorBirthday->diff($dateDay)->y;
-        //die(var_dump($age));
+        
+        if($visitorBirthday!=null){
+            if($visitorBirthday < $dateDay) $age = $visitorBirthday->diff($dateDay)->format('%y');
+            $intAge = (int)$age;
+        }
+//die(var_dump($visitorBirthday, $dateDay, $reduction, $visitDuration));
         else return 'false';
         
-        if($reduction && $visitDuration === 1) return $this->fullPriceReduction;
-        if($reduction && $visitDuration === .5) return $this->halfPriceReduction;
-         
-        if($age <= $this->ageBaby)                             return $this->priceBaby;
-        if($age <= $this->ageChild && $visitDuration === 1)    return $this->fullPriceChild;
-        if($age <= $this->ageChild && $visitDuration === .5)   return $this->halfPriceChild;
-        if($age <= $this->ageNormal && $visitDuration === 1)   return $this->fullPriceNormal;
-        if($age <= $this->ageNormal && $visitDuration === 0.5) return $this->halfPriceNormal;
-        if($visitDuration === .5)                               return $this->halfPriceSenior;
-        if($visitDuration === 1)                             return $this->fullPriceSenior;
+        if($intAge>=0){
+            if($reduction && $visitDuration == 1) return $this->fullPriceReduction;
+            if($reduction && $visitDuration == .5) return $this->halfPriceReduction;
+            
+            if($intAge <= $this->ageBaby)                             return $this->priceBaby;
+            if($intAge <= $this->ageChild && $visitDuration == 1)    return $this->fullPriceChild;
+            if($intAge <= $this->ageChild && $visitDuration == .5)   return $this->halfPriceChild;
+            if($intAge <= $this->ageNormal && $visitDuration == 1)   return $this->fullPriceNormal;
+            if($intAge <= $this->ageNormal && $visitDuration == 0.5) return $this->halfPriceNormal;
+            if($visitDuration == .5)                               return $this->halfPriceSenior;
+            if($visitDuration == 1)                             return $this->fullPriceSenior;
+        }
+       // die(var_dump($this->ageNormal).var_dump($intAge));
     }
 }

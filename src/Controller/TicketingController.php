@@ -209,11 +209,12 @@ class TicketingController extends AbstractController
                     
                     if($visitorBirthday != null ){
                         $calculatePrice = New CalculatePrice();
-                        $currentPrice = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
-                        die(var_dump($currentPrice, $ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()));
+                        $price = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
+                      //  die(var_dump($price, $ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()));
+                        $currentPrice = floatval($price);
                         $ticket->setPrice($currentPrice); 
-                    
                     }
+
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ticket);
                     $em->flush();
@@ -238,51 +239,7 @@ class TicketingController extends AbstractController
                 'title' => 'Détail de chaque visiteur',
                 'numberTickets' => $currentUser->getNumberTickets()
             ]);    
-        }
-
-    /*    if($currentNumberTickets>0){
-            for($i=1; $i<=$currentNumberTickets; $i++)
-            {
-                $ticket= new Ticket(); 
-                $currentUser->addTicket($ticket);
-                $em->persist($ticket);
-                $em->flush();
-            }
-        }
-        
-        $currentIdOrder = $currentUser->getId();
-        $ticketArray= $this->getDoctrine()->getRepository(Ticket::class)->findBy(['idOrder'=>$currentIdOrder]);       
-        $ticketForm = $this->createForm(TicketCollectionType ::class, ['TicketCollection' => $ticketArray]);
-        
-        $ticketForm->handleRequest($request);
-        
-
-        if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {
-
-            $submittedTicketArray = $ticketForm->getData();
-
-            foreach($submittedTicketArray as $currentTicket){
-                if($ticket->getVisitorBirthday() != null){
-                  //  $visitDuration= $currentTicket['visit_duration'];   
-                  //  $reduction= $currentTicket->getReduction();
-                  //  $visitorBirthday = $currentTicket->getVisitorBirthday()->format('Y-m-d');
-                 //die(var_dump($visitorBirthday));
-                    $calculatePrice = New CalculatePrice();
-                    $currentPrice = $calculatePrice->calculatePrice($currentTicket->visitorBirthday, $reduction, $visitDuration); 
-                    
-                    $ticket->setPrice($currentPrice);
-                }
-
-           /*     else{
-                    return $this->render('ticketing/birthdayError.html.twig', [ 
-                        
-                        ]);
-                }*/
-          /*  }
-
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();*/
-           
+        }          
 
     /**
      * @Route("/billetterie/recapitulatif", name="summary")
@@ -307,6 +264,7 @@ class TicketingController extends AbstractController
             throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
         }
 
+        $this->currentOrderId = $currentUser->getId();
         $this->orderCode     = $currentUser->getOrderCode();
         $this->orderDate     = $currentUser->getOrderDate();
         $this->numberTickets = $currentUser->getNumberTickets();
@@ -316,15 +274,8 @@ class TicketingController extends AbstractController
         $this->clientCountry = $currentUser->getClientCountry();
         $this->clientEmail   = $currentUser->getClientEmail();
         $this->visitDate     = $currentUser->getVisitDate();
-        
-        $this->name          = $currentOrder->getVisitorName();
-        $this->birthday      = $currentOrder->getVisitorBirthday();
-        $this->reduction     = $currentOrder->getReduction();
-        $this->country       = $currentOrder->getCountry();
-        $this->price         = $currentOrder->getPrice();
 
         $tickets = $currentUser->getTickets();
-
         foreach($tickets as $ticket)
         {
             $ticket = array(
@@ -336,8 +287,16 @@ class TicketingController extends AbstractController
             );
         }
 
-        $this->totalPrice = $currentUser->getTotalPrice();
+        $rawSql = "SELECT SUM(`price`) as totalPrice FROM `ticket` where id_order_id = $this->currentOrderId";
+                            
+        $stmt = $em->getConnection()->prepare($rawSql);
+        $stmt->execute([]);
+        $result = $stmt->fetch();
+        $totalPrice = floatval($result["totalPrice"]);
 
+        $currentUser->setTotalPrice($totalPrice);
+        $this->totalPrice = $currentUser->getTotalPrice();
+        
         return $this->render('ticketing/summary.html.twig', [
             'title'         => 'Récapitulatif de commande',
             'orderCode'     => $this->orderCode,

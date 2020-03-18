@@ -25,22 +25,22 @@
                 {% else %} Demi-journée<br/>
                 {% endif %}
                 Nombre de billets : {{ numberTickets }}<br/>
-                Prix total de la commande : {{ totalPrice }}</p>
+                Prix total de la commande : {{ totalPrice }}€</p>
 
+                <h4>Détails des billets</h4>
                 {% for ticket in tickets %}
-
                     <p>Nom et prénom : {{ ticket.visitorName }}</br>
                     Date de naissance : {{ ticket.visitorBirthday | date('d/m/Y') }}</br>
-                    {% if ticket.reduction %}Bénéficie d'une réduction
-                    {% else %}Ne bénéficie pas de réduction
-                    Prix du billet : {{ ticket.price }}€</br>
-                    {% endif %}</p>
+                    {% if ticket.reduction %}Bénéficie d'une réduction</br>
+                    {% else %}Ne bénéficie pas de réduction</br>
+                    {% endif %}
+                    Prix du billet : {{ ticket.price }}€</p>   
                 
                 {% endfor %}
-
-                <p>Nom et prénom du client : {{ clientName }}<br/>
-                Adresse du client : {{ address }}<br/>
-                Email du client : {{ email }} </p>
+                <h4>Profil du client</h4>
+                <p>Nom et prénom : {{ clientName }}<br/>
+                Adresse : {{ address }}<br/>
+                Email : {{ email }} </p>
 
                 
 
