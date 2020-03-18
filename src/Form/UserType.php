@@ -45,7 +45,7 @@ class UserType extends AbstractType
                 ],
             ])
             ->add('clientName', TextType::class, ['label'   => 'Nom et prénom'])
-            ->add('clientAddress', TextType::class, ['label'   => 'Adresse'])
+            ->add('clientAddress', TextType::class, ['label'   => 'Adresse complète'])
             ->add('clientCountry', CountryType::class, ['label' => 'Pays'])
             ->add('clientEmail', EmailType::class, ['label' => 'Email'])
             

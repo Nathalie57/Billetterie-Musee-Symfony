@@ -25,16 +25,24 @@
                 {% else %} Demi-journée<br/>
                 {% endif %}
                 Nombre de billets : {{ numberTickets }}<br/>
-                Prix total de la commande : {{ totalPrice }}<br/>
-                Nom et prénom du client : {{ clientName }}<br/>
+                Prix total de la commande : {{ totalPrice }}</p>
+
+                {% for ticket in tickets %}
+
+                    <p>Nom et prénom : {{ ticket.visitorName }}</br>
+                    Date de naissance : {{ ticket.visitorBirthday | date('d/m/Y') }}</br>
+                    {% if ticket.reduction %}Bénéficie d'une réduction
+                    {% else %}Ne bénéficie pas de réduction
+                    Prix du billet : {{ ticket.price }}€</br>
+                    {% endif %}</p>
+                
+                {% endfor %}
+
+                <p>Nom et prénom du client : {{ clientName }}<br/>
                 Adresse du client : {{ address }}<br/>
                 Email du client : {{ email }} </p>
 
-                {% for i in 1..numberTickets %}
-                <p>Visiteur n°{{ i }}</br>>
-                Nom et prénom : {{ name }}</br>>
-                Prix du billet : {{ price }}€</p>
-                {% endfor %}</br>
+                
 
                 <form action="{{ path('paiement') }}">
                     <button type="submit">Payer la commande</button>

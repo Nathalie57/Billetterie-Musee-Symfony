@@ -21,9 +21,19 @@
 			<header>
 				<h2>{{ title }}</h2>
 			</header>
-{{ form_start(choiceForm) }}
-
-{{ form_end(choiceForm) }}
+				
+				{{ form_start(choiceForm) }}
+					{#{% for i in 1..numberTickets %}
+						<p>Visiteur n°{{ i }}</p>#}
+						{{ form_row(choiceForm.numberTickets) }}</br>
+						{{ form_row(choiceForm.visitDate) }}</br>
+						{{ form_row(choiceForm.visitDuration) }}</br>
+						{{ form_row(choiceForm.clientName) }}</br>
+						{{ form_row(choiceForm.clientAddress) }}</br>
+						{{ form_row(choiceForm.clientCountry) }}</br>
+						{{ form_row(choiceForm.clientEmail) }}</br>
+					{#{% endfor %}#}
+				{{ form_end(choiceForm) }}
 
 		</article>
 	</div>

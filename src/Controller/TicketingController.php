@@ -14,11 +14,13 @@ use App\Services\CalculatePrice;
 use App\Services\AuthorizedDate;
 use App\Entity\User;
 use App\Entity\Ticket;
-use App\Form\TicketCollectionType;
+//use App\Form\TicketCollectionType;
 use App\Form\UserType;
 use App\Form\TicketType;
-use App\Form\ClientType;
+//use App\Form\ClientType;
+use App\Form\StripeType;
 use Ramsey\Uuid\Uuid;
+use Stripe\Stripe;
 
 class TicketingController extends AbstractController
 {
@@ -144,15 +146,17 @@ class TicketingController extends AbstractController
             $em->flush();
 
             $session->set('currentUserId', $user->getId());
+            $session->set('currentVisitor', 0);
             
             //On récupère la date, le nombre de billets et la durée de la visite
-          /*  if($session->get('currentUserId')){  
+            if($session->get('currentUserId')){  
                 $sessionUserId = $session->get('currentUserId');
             }
             $repository = $em->getRepository(User::class);
-            $currentUser = $repository->findOneBy(['id' => $sessionUserId]);*/
+            $currentUser = $repository->findOneBy(['id' => $sessionUserId]);
           
-        //    $currentNumberTickets = $currentUser->getNumberTickets();
+         //   $currentNumberTickets = $currentUser->getNumberTickets();
+        //    die(var_dump($currentNumberTickets));
         //    $currentVisitDate = $currentUser->getVisitDate();
         //    $currentVisitDuration = $currentUser->getVisitDuration(); 
 
@@ -161,7 +165,8 @@ class TicketingController extends AbstractController
         
         return $this->render('ticketing/choiceForm.html.twig', [ 
             'choiceForm' => $userForm->createView(),
-            'title' => 'Choix des billets et identification du client'
+            'title' => 'Choix des billets et identification du client',
+          //  'numberTickets' => $currentUser->getNumberTickets()
             ]);
     
     }
@@ -191,28 +196,32 @@ class TicketingController extends AbstractController
                 $ticket->setIdOrder($currentUser); 
                 $ticketForm = $this->createForm(TicketType::class, $ticket);
                 $ticketForm->handleRequest($request);
-               // die(var_dump($i));
-                if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {          
-            
-                    $ticket = $ticketForm->getData();
 
-                    $calculatePrice = New CalculatePrice();
-                    $currentPrice = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
-//die(var_dump($currentPrice, $ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()));
+                if ($ticketForm->isSubmitted() && $ticketForm->isValid()) {          
+
+                    $currentVisitor = $session->get('currentVisitor');
+                                       
+                    $currentVisitor++;
+                    $session->set('currentVisitor', $currentVisitor);
+                    
+                    $ticket = $ticketForm->getData();
+                    $visitorBirthday = $ticket->getVisitorBirthday();
+                    
+                    if($visitorBirthday != null ){
+                        $calculatePrice = New CalculatePrice();
+                        $currentPrice = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
+                        die(var_dump($currentPrice, $ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()));
+                        $ticket->setPrice($currentPrice); 
+                    
+                    }
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ticket);
                     $em->flush();
 
                     $currentIdOrder = $currentUser->getId();
                                   
-                    $rawSql ="SELECT COUNT(`id_order_id`) FROM `ticket` AS totalTickets WHERE id_order_id = $currentIdOrder";
-                    $stmt = $em->getConnection()->prepare($rawSql);
-                    $stmt->execute([]);
-                    $result = $stmt->fetch();
+                if($currentNumberTickets>$currentVisitor) return $this->redirectToRoute('visitors_designation');
 
-                    while($result<$currentNumberTickets){
-                        return $this->redirectToRoute('visitors_designation');
-                    }
                 return $this->redirectToRoute('summary');
                 }   
             }
@@ -227,7 +236,7 @@ class TicketingController extends AbstractController
             return $this->render('ticketing/ticketForm.html.twig', [
                 'form_collection' => $ticketForm->createView(),
                 'title' => 'Détail de chaque visiteur',
-                'numberTickets' => $ticket->getIdOrder()
+                'numberTickets' => $currentUser->getNumberTickets()
             ]);    
         }
 
@@ -307,26 +316,24 @@ class TicketingController extends AbstractController
         $this->clientCountry = $currentUser->getClientCountry();
         $this->clientEmail   = $currentUser->getClientEmail();
         $this->visitDate     = $currentUser->getVisitDate();
-       // $this->name          = $currentOrder->getVisitorName();
-       // $this->birthday      = $currentOrder->getVisitorBirthday();
-       // $this->reduction     = $currentOrder->getReduction();
-       // $this->country       = $currentOrder->getCountry();
-       // $this->price         = $currentOrder->getPrice();
-
-       $tickets = $currentUser->getTickets();
-
-       foreach($tickets as $ticket){
         
-        $ticketsArray = [];
-        $ticketWithPrice = new Ticket();
+        $this->name          = $currentOrder->getVisitorName();
+        $this->birthday      = $currentOrder->getVisitorBirthday();
+        $this->reduction     = $currentOrder->getReduction();
+        $this->country       = $currentOrder->getCountry();
+        $this->price         = $currentOrder->getPrice();
 
-        $this->name          = $ticketWithPrice->getVisitorName();
-        $this->birthday      = $ticketWithPrice->getVisitorBirthday();
-        $this->reduction     = $ticketWithPrice->getReduction();
-        $this->country       = $ticketWithPrice->getCountry();
-        $this->price         = $ticketWithPrice->getPrice();
-        
-        $currentTicketsArray = array_push($ticketsArray, $ticketWithPrice);
+        $tickets = $currentUser->getTickets();
+
+        foreach($tickets as $ticket)
+        {
+            $ticket = array(
+                'name'          => $currentOrder->getVisitorName(),
+                'birthday'      => $currentOrder->getVisitorBirthday(),
+                'reduction'     => $currentOrder->getReduction(),
+                'country'       => $currentOrder->getCountry(),
+                'price'         => $currentOrder->getPrice()
+            );
         }
 
         $this->totalPrice = $currentUser->getTotalPrice();
@@ -343,12 +350,7 @@ class TicketingController extends AbstractController
             'address'       => $this->address,
             'clientCountry' => $this->clientCountry,
             'email'         => $this->clientEmail,
-            
-            'name'      => $this->name,
-            'birthday'  => $this->birthday,
-            'reduction' => $this->reduction,
-            'country'   => $this->country,
-            'price'     => $this->price
+            'tickets'       => $tickets
             ]);
     }
 
@@ -356,7 +358,23 @@ class TicketingController extends AbstractController
      * @Route("/billetterie/paiement", name="paiement")
      */ 
     public function paiement(EntityManagerInterface $em, Request $request, SessionInterface $session){
-
+            
+        $stripe = new Stripe;
+        $stripeForm = $this->createForm(StripeType::class, $stripe);
+        $stripeForm->handleRequest($request);
+               
+            if ($stripeForm->isSubmitted() && $stripeForm->isValid()) {          
+            
+                $stripe = $stripeForm->getData();
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($ticket);
+                $em->flush();    
+            }
+    
+        return $this->render(':premium:payment.html.twig', [
+        'form' => $form->createView(),
+        'stripe_public_key' => $this->getParameter('stripe_public_key'),
+    ]);
     }
 
      /**

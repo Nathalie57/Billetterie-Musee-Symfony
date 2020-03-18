@@ -1501,6 +1501,27 @@ input, select, textarea {
 		line-height: 1.35em;
 	}
 
+	#ticket_reduction {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		-ms-appearance: none;
+	}
+
+	#ticket_reduction {
+		-border-radius: 4px;
+		height: 15px;
+		width: 15px;
+		background: #fff;
+		border: 1px solid #ccc;
+	}
+
+	#ticket_reduction:checked {
+		background: black;
+		margin:0px;
+		position: relative;
+		
+	  }
+
 	form ::-webkit-input-placeholder {
 		color: #999;
 	}
