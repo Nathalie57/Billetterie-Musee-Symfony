@@ -7,6 +7,8 @@
 		<link rel="stylesheet" href="{{ asset('assets/css/main.css') }}" />
 		<noscript><link rel="stylesheet" href="{{ asset('assets/css/noscript.css') }}" /></noscript>
         {% block stylesheets %}{% endblock %}
+        
+        {% block javascripts %}<script src="https://js.stripe.com/v3/"></script>{% endblock %}
        
     </head>
      {% block body %}{% endblock %}
@@ -15,6 +17,5 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
-    
-     {% block javascripts %}{% endblock %}
+             
 </html>

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Swift_Mailer;
+
 class SendEmail{
 
 public function sendConfirmation($name, \Swift_Mailer $mailer){
@@ -10,7 +12,6 @@ public function sendConfirmation($name, \Swift_Mailer $mailer){
         ->setTo('recipient@example.com')
         ->setBody(
             $this->renderView(
-                // templates/emails/registration.html.twig
                 'emails/registration.html.twig',
                 ['name' => $name]
             ),

@@ -73,6 +73,16 @@ class User
      */
     private $tickets;
 
+    /**
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    private $token;
+
+    public function __construct()
+    {
+        $this->tickets = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -225,6 +235,18 @@ class User
                 $ticket->setIdOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function settoken(?string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }
