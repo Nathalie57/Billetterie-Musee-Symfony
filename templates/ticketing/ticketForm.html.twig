@@ -2,8 +2,6 @@
 
 {% block body %}
 
-
-
 <div id="wrapper">
     <nav id="nav">
         <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
@@ -12,29 +10,22 @@
         <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
 	</nav>
     <div id="main">
-        <article id="billetterie" class="panel">
-            {{ form_start(form_collection) }}
-         {#  {% for ticket in form_collection.tickets %}#}
-            
+        <article id="visitors_designation" class="panel">
+            {{ form_start(form_collection) }} 
+            {% if numberTickets>1 %}
+            {% set i = currentVisitor %}
+				<h4>Visiteur n°{{ i }}</h4></br>
+            {% endif %}        
                 {{ form_row(form_collection.visitorName) }}</br>
 				{{ form_row(form_collection.visitorBirthday) }}</br>
 				{{ form_row(form_collection.country) }}</br>
 				{{ form_row(form_collection.reduction) }}</br>
-        {#     {% endfor %}#}
+             
+        
            {{ form_end(form_collection) }}
-            
-{#<form action="" method="POST" data-qty="{{numberTickets}}" id="formToComplete">
-<input type="submit">
-</form>#}
-
+    
         </article>
     </div>
 </div>
 
-
-{% endblock %}
-
-{% block javascripts %}
-<script src="/js/ticketForm.js"></script>
-<script src="/js/runForm.js" defer></script>
 {% endblock %}

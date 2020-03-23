@@ -14,8 +14,9 @@
         <div id="main">
             <article id="billetterie" class="panel">
                 <h2>{{ title }}</h2><br/>
-                <h4>Merci de vérifier les informations avant de procéder au paiement.</h4><br/>
-
+                <h5>Merci de vérifier les informations avant de procéder au paiement.</h5><br/>
+               
+                <h4>Détails de la commande</h4></br>
                 <p>Numéro de commande : {{ orderCode }} <br/>
                 {#Date de commande : {{ orderDate | date('d/m/Y') }}<br/>#}
                 Date de la visite : {{ visitDate | date('d/m/y') }}<br/>
@@ -27,17 +28,26 @@
                 Nombre de billets : {{ numberTickets }}<br/>
                 Prix total de la commande : {{ totalPrice }}€</p>
 
-                <h4>Détails des billets</h4>
+                {% if numberTickets>1 %}
+                <h4>Détails des billets</h4></br>
+                {% else %}<h4>Détail du billet</h4></br>
+                {% endif %}
+
+
                 {% for ticket in tickets %}
+                    {% if numberTickets>1 %}
+                    <h5>Visiteur n°{{ loop.index }}</h5>
+                    {% endif %}
                     <p>Nom et prénom : {{ ticket.visitorName }}</br>
                     Date de naissance : {{ ticket.visitorBirthday | date('d/m/Y') }}</br>
-                    {% if ticket.reduction %}Bénéficie d'une réduction</br>
+                    {% if ticket.reduction %}Bénéficie d'une réduction - Une pièce justificative pourra vous être demandée</br>
                     {% else %}Ne bénéficie pas de réduction</br>
                     {% endif %}
-                    Prix du billet : {{ ticket.price }}€</p>   
-                
+                    Prix du billet : {{ ticket.price }}€</p>  
+                    
                 {% endfor %}
-                <h4>Profil du client</h4>
+                
+                <h4>Profil du client</h4></br>
                 <p>Nom et prénom : {{ clientName }}<br/>
                 Adresse : {{ address }}<br/>
                 Email : {{ email }} </p>

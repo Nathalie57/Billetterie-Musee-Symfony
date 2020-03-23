@@ -1,0 +1,30 @@
+{% extends 'base.html.twig'%}
+
+{% block body %}
+ 
+    
+        <div id="wrapper">
+            <nav id="nav">
+                <a href="{{ path('home') }}" class="icon solid fa-home"><span>Accueil</span></a>
+                <a href="{{ path('opening_hours') }}" class="icon solid fa-clock"><span>Les horaires</span></a>
+                <a href="{{ path('price') }}" class="icon solid fa-euro-sign"><span>Les tarifs</span></a>
+                <a href="{{ path('choice') }}" class="icon solid fa-ticket-alt active"><span>Réservation</span></a>
+		    </nav>
+
+        <div id="main">
+            <article id="billetterie" class="panel">
+            
+                <h3>Merci pour votre commande !</h3></br>
+                <p>Votre paiement a bien été enregistré. Vous allez recevoir un mail de confirmation dans quelques instants à l'adresse suivante : {{ clientEmail }}.</p>
+
+                <form action="{{ path('home') }}">
+                    <button type="submit">Retour à l'accueil</button>
+                </form>
+
+	        </article>
+	    </div>
+	    </div>
+    </body>
+
+{% endblock %}
+

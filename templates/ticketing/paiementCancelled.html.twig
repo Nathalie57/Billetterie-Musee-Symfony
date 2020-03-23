@@ -1,6 +1,7 @@
 {% extends 'base.html.twig'%}
 
 {% block body %}
+ 
     
         <div id="wrapper">
             <nav id="nav">
@@ -11,11 +12,12 @@
 		    </nav>
 
         <div id="main">
-            <article id="paiement" class="panel">
-                <p>Le paiement a échoué.</p>
+            <article id="billetterie" class="panel">
             
+                <p>Votre paiement n'a pu aboutir. Veuillez recommencer.</p>
+
                 <form action="{{ path('paiement') }}">
-                    <button type="submit">Retour au paiement</button>
+                    <button type="submit">Payer la commande</button>
                 </form>
 
 	        </article>
@@ -24,3 +26,4 @@
     </body>
 
 {% endblock %}
+

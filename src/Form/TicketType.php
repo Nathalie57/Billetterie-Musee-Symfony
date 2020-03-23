@@ -23,7 +23,7 @@ class TicketType extends AbstractType
                 'widget' => 'single_text'])
             ->add('reduction', CheckboxType::class, ['label' => 'Bénéficie d\'une réduction ', 'required'=>false])
             ->add('country', CountryType::class, ['label' => 'Pays de résidence : ']) 
-            ->add('Submit', SubmitType::class);   
+            ->add('Valider', SubmitType::class);   
         ;
     }
 

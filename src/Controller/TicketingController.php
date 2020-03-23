@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +33,7 @@ class TicketingController extends AbstractController
     public function index()
     {
         return $this->render('ticketing/index.html.twig', [
-            'title' => 'Billetterie du Louvre',
-            'paragraph' => 'Achetez vos billets en toute simplicité !'
+            'title'        => 'Billetterie du Louvre',
         ]);
     }
 
@@ -155,20 +155,15 @@ class TicketingController extends AbstractController
                 $sessionUserId = $session->get('currentUserId');
             }
             $repository = $em->getRepository(User::class);
-            $currentUser = $repository->findOneBy(['id' => $sessionUserId]);
-          
-         //   $currentNumberTickets = $currentUser->getNumberTickets();
-        //    die(var_dump($currentNumberTickets));
-        //    $currentVisitDate = $currentUser->getVisitDate();
-        //    $currentVisitDuration = $currentUser->getVisitDuration(); 
+            $currentUser = $repository->findOneBy(['id' => $sessionUserId]); 
 
-             return $this->redirectToRoute('visitors_designation');
+            return $this->redirectToRoute('visitors_designation');
         }
         
         return $this->render('ticketing/choiceForm.html.twig', [ 
-            'choiceForm' => $userForm->createView(),
-            'title' => 'Choix des billets et identification du client',
-          //  'numberTickets' => $currentUser->getNumberTickets()
+            'choiceForm'          => $userForm->createView(),
+            'title'               => 'Choix des billets et identification du client',
+            'canBuyTicketsAmount' => $canBuyTicketsAmount
             ]);
     
     }
@@ -212,19 +207,18 @@ class TicketingController extends AbstractController
                     if($visitorBirthday != null ){
                         $calculatePrice = New CalculatePrice();
                         $price = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
-                      //  die(var_dump($price, $ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()));
                         $currentPrice = floatval($price);
                         $ticket->setPrice($currentPrice); 
                     }
-
+                    $currentVisitor = $session->get('currentVisitor');
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($ticket);
                     $em->flush();
 
                     $currentIdOrder = $currentUser->getId();
-                                  
+                 //die(var_dump($currentVisitor));                  
                 if($currentNumberTickets>$currentVisitor) return $this->redirectToRoute('visitors_designation');
-
+               
                 return $this->redirectToRoute('summary');
                 }   
             }
@@ -236,10 +230,11 @@ class TicketingController extends AbstractController
             }
         }
      
-            return $this->render('ticketing/ticketForm.html.twig', [
-                'form_collection' => $ticketForm->createView(),
-                'title' => 'Détail de chaque visiteur',
-                'numberTickets' => $currentUser->getNumberTickets()
+        return $this->render('ticketing/ticketForm.html.twig', [
+            'form_collection' => $ticketForm->createView(),
+            'title' => 'Détail de chaque visiteur',
+            'numberTickets' => $currentUser->getNumberTickets(),
+            'currentVisitor' => $session->get('currentVisitor')+1
             ]);    
         }          
 
@@ -278,14 +273,16 @@ class TicketingController extends AbstractController
         $this->visitDate     = $currentUser->getVisitDate();
 
         $tickets = $currentUser->getTickets();
+        
+
         foreach($tickets as $ticket)
-        {
+        {            
             $ticket = array(
                 'name'          => $currentOrder->getVisitorName(),
                 'birthday'      => $currentOrder->getVisitorBirthday(),
                 'reduction'     => $currentOrder->getReduction(),
                 'country'       => $currentOrder->getCountry(),
-                'price'         => $currentOrder->getPrice()
+                'price'         => $currentOrder->getPrice(),
             );
         }
 
@@ -315,93 +312,128 @@ class TicketingController extends AbstractController
             'address'       => $this->address,
             'clientCountry' => $this->clientCountry,
             'email'         => $this->clientEmail,
-            'tickets'       => $tickets
+            'tickets'       => $tickets,
             ]);
     }
 
     /**
      * @Route("/billetterie/paiement", name="paiement")
      */ 
-    public function paiement(EntityManagerInterface $em, Request $request, SessionInterface $session){
+    public function paiement(\Swift_Mailer $mailer, EntityManagerInterface $em, Request $request, SessionInterface $session, UrlGeneratorInterface $router){
         
         if($session->get('currentUserId')){  
             $currentUserId = $session->get('currentUserId');
         }
 
         $repository = $em->getRepository(User::class);
-        $currentUser = $repository->findOneBy(['id' => $currentUserId]);
+        $currentUserId = $repository->findOneBy(['id' => $currentUserId]);
 
-        $totalPrice = $currentUser->getTotalPrice();
+        $totalPrice = $currentUserId->getTotalPrice();
         $formattedTotalPrice = number_format($totalPrice, 2, ',', '');
-        
-        \Stripe\Stripe::setApiKey('sk_test_OVSeLOoumUW63SWENG6C0BtL00V3KiTZ1C');
 
-        $intent = \Stripe\PaymentIntent::create([
-            'amount' => $currentUser->getTotalPrice()*10,
-            'currency' => 'eur',
-            // Verify your integration in this guide by including this parameter
-            'metadata' => ['integration_check' => 'accept_a_payment'],
-        ]);
-
-       /* $stripe = new User;
-        $form = $this->createForm(StripeType::class, $stripe);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {   
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($stripe);
-            $em->flush();
-        }*/
-
-        return $this->render('ticketing/checkout.html.twig', [
-            'totalPrice' => $formattedTotalPrice,
-            ]);
+        $successUrl =  $router->generate('paiement_success', [], UrlGeneratorInterface::ABSOLUTE_URL); 
+        $cancelUrl =  $router->generate('paiement_cancelled', [], UrlGeneratorInterface::ABSOLUTE_URL);
             
-        /*$paiementManager = new PaiementManager;
-        //$order = $session->get('order');
-        if ($paiementManager->checkoutAction($currentUser, $request)) {
-            $notification->sendConfirmationAction($currentUser);
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($order);
-            $em->flush();
-
-            return $this->render('default/confirmation.html.twig', [
-                'order' => $order, ]);
-        }
-
-        return $this->redirectToRoute('index');*/
-        
-      /*  \Stripe\Stripe::setApiKey('sk_test_OVSeLOoumUW63SWENG6C0BtL00V3KiTZ1C');
-       /* \Stripe\Account::retrieve(
-            'acct_1GBS9KFm6EaYeHJ7'
-          );
-
-        $session = \Stripe\Checkout\Session::create([
+        \Stripe\Stripe::setApiKey('sk_test_OVSeLOoumUW63SWENG6C0BtL00V3KiTZ1C');
+       
+        $sessionStripe = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[
                 'name' => 'Billetterie du Louvre',
-                'description' => $currentUser->getOrderCode(),
-                'images' => ['https://example.com/t-shirt.png'],
-                'amount' => $currentUser->getTotalPrice()*100,
+                'description' => $currentUserId->getClientName(),
+                'images' => ['https://cdn.pixabay.com/photo/2017/08/15/11/29/paris-2643590__480.jpg'],
+                'amount' => $currentUserId->getTotalPrice()*100,
                 'currency' => 'eur',
                 'quantity' => 1,
             ]],
-        'success_url' => 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => 'https://example.com//billetterie/paiement/cancel',
-        'client_reference_id' => $currentUser->getOrderCode()
+        'success_url' => $successUrl,
+        'cancel_url' => $cancelUrl,
         ]);
 
-        $currentUser->setStripeToken($sessionStripe->id);
-        $em->persist($currentUser);
+        $currentUserId->setToken($sessionStripe->id);
+        $em->persist($currentUserId);
         $em->flush();
-        return $this->render('ticketing/paiement.html.twig', []);*/
+
+        if($successUrl){
+
+            if($session->get('currentIdOrder')){  
+                $currentIdOrder = $session->get('currentIdOrder');
+            }
+            
+            $repository = $em->getRepository(Ticket::class);
+            $currentOrder = $repository->findOneBy(['idOrder' => $currentIdOrder]);
+  
+            if (!$currentOrder) {
+                throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
+            }
+            
+            $this->orderCode     = $currentUserId->getOrderCode();
+            $this->clientEmail   = $currentUserId->getClientEmail();
+            $this->visitDate     = $currentUserId->getVisitDate();
+            $this->totalPrice    = $currentUserId->getTotalPrice();
+
+            $tickets = $currentUserId->getTickets();
+            foreach($tickets as $ticket)
+            {
+                $ticket = array(
+                    'name' => $currentOrder->getVisitorName(),
+                );
+            }
+            
+            $message = (new \Swift_Message('Billetterie du Louvre'))
+                ->setFrom('billetteriedulouvre@gmail.com')
+                ->setTo($this->clientEmail)
+                ->setBody(
+                    $this->renderView(
+                        'ticketing/emailConfirmation.html.twig',[
+                            'orderCode'  => $this->orderCode,
+                            'visitDate'  => $this->visitDate,
+                            'totalPrice' => $this->totalPrice,
+                            'tickets'    => $tickets
+                        ]),
+                    'text/html'
+                );
+
+            $mailer->send($message);
+        }
+
+        return $this->render('ticketing/checkout.html.twig', [
+            'CHECKOUT_SESSION_ID' => $sessionStripe->id,
+            ]);
+    }
+
+    /**
+     * @Route("/billetterie/paiement/success", name="paiement_success")
+     */ 
+    public function paiementSuccess(SessionInterface $session, EntityManagerInterface $em){
+        
+        if($session->get('currentUserId')){  
+            $currentUserId = $session->get('currentUserId');
+        }
+
+        $repository = $em->getRepository(User::class);
+        $currentUserId = $repository->findOneBy(['id' => $currentUserId]);
+
+        $clientEmail = $currentUserId->getClientEmail();
+
+        return $this->render('ticketing/paiementSuccess.html.twig', [
+            'clientEmail' => $clientEmail
+            ]);
     }
 
      /**
+     * @Route("/billetterie/paiement/cancelled", name="paiement_cancelled")
+     */ 
+    public function paiementCancelled(SessionInterface $session, EntityManagerInterface $em){
+        
+        return $this->render('ticketing/paiementCancelled.html.twig', [
+            ]);
+    }
+
+    /**
      * @Route("/billetterie/confirmation", name="confirmation")
      */ 
-    public function sendConfirmation($name, \Swift_Mailer $mailer){
+    public function sendConfirmation(\Swift_Mailer $mailer, SessionInterface $session, EntityManagerInterface $em){
 
         if($session->get('currentUserId')){  
             $currentUserId = $session->get('currentUserId');
@@ -421,21 +453,38 @@ class TicketingController extends AbstractController
             throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
         }
 
-        $clientMail = $currentUser->getClientEmail();
+       
+        $this->orderCode     = $currentUser->getOrderCode();
+        $this->clientEmail   = $currentUser->getClientEmail();
+        $this->visitDate     = $currentUser->getVisitDate();
+        $this->totalPrice    = $currentUser->getTotalPrice();
+
+        $tickets = $currentUser->getTickets();
+        foreach($tickets as $ticket)
+        {
+            $ticket = array(
+                'name' => $currentOrder->getVisitorName(),
+            );
+        }
+
+   //     $clientEmail = $currentUser->getClientEmail();
         
         $message = (new \Swift_Message('Billetterie du Louvre'))
             ->setFrom('billetteriedulouvre@gmail.com')
-            ->setTo($clientEmail)
+            ->setTo($this->clientEmail)
             ->setBody(
                 $this->renderView(
-                    'ticketing/emailConfirmation.html.twig',
-                    ['name' => $name]
-                ),
+                    'ticketing/emailConfirmation.html.twig',[
+                        'orderCode'  => $this->orderCode,
+                        'visitDate'  => $this->visitDate,
+                        'totalPrice' => $this->totalPrice,
+                        'tickets'    => $tickets
+                    ]),
                 'text/html'
             );
-    
+
         $mailer->send($message);
     
-        return $this->render();
+        return $this->redirectToRoute('home');
         }
     }

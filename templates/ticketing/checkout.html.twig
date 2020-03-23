@@ -13,33 +13,24 @@
 
         <div id="main">
             <article id="checkout" class="panel">
+                    <script src="https://js.stripe.com/v3/"></script>
+
+		<form action="/charge" method="post" id="payment-form">
+		<div class="form-row">
+			<div id="card-element">
+               
                     <script>
-                    var stripe = Stripe('pk_test_GPFyeTwBm3iIsnTEw8g2Ezkt00e31t3we6');
-                    var elements = stripe.elements();
+                        var stripe = Stripe('pk_test_GPFyeTwBm3iIsnTEw8g2Ezkt00e31t3we6');
+                        stripe.redirectToCheckout({
+                        // Make the id field from the Checkout Session creation API response
+                        // available to this file, so you can provide it as parameter here
+                        // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+                        sessionId: '{{CHECKOUT_SESSION_ID}}'
+                        }).then(function (result) {
+                        // If `redirectToCheckout` fails due to a browser or network
+                        // error, display the localized error message to your customer
+                        // using `result.error.message`.
+                        });
                     </script>
-
-                    <form id="payment-form">
-                        <div id="card-element">
-                            <!-- Elements will create input elements here -->
-                        </div>
-
-                        <!-- We'll put the error messages in this element -->
-                        <div id="card-errors" role="alert"></div></br>
-
-                        <button id="submit">Payer {{ totalPrice }}€</button>
-                    </form>
-                
-                <script>
-                var style = {
-                    base: {
-                        color: "#32325d",
-                    }
-                    };
-
-                    var card = elements.create("card", { style: style });
-                    card.mount("#card-element");
-                
-                
-                </script>
-
+        
 {% endblock %}

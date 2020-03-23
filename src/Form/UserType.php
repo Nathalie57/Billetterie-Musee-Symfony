@@ -36,7 +36,8 @@ class UserType extends AbstractType
             ])
             ->add('visitDate', DateType::class, [
                 'label' => 'Date de la visite',
-                'widget' => 'single_text'])
+                'widget' => 'single_text',
+                'help' => 'Attention, la réservation n\'est pas ouverte les dimanches et jours fériés',])
             ->add('visitDuration', ChoiceType::class, [
                 'label'   => 'Durée de la visite',
                 'choices' => [
