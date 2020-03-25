@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    {% block title %}Votre commande au Musée du Louvre{% endblock %}
+    {% block title %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 </head>
 
@@ -16,7 +16,7 @@
 
     Code de réservation : {{ orderCode }}</br>
     Date de la visite : {{ visitDate | date('d/m/Y') }}</br>
-    Nombre de billets {{ numberTickets }}</br>
+    Nombre de billets : {{ numberTickets }}</br>
     Prix total de la commande : {{ totalPrice }}</br>
     
     {% for ticket in tickets %}

@@ -386,7 +386,7 @@ class TicketingController extends AbstractController
                 );
             }
             
-            $message = (new \Swift_Message('Billetterie du Louvre'))
+            $message = (new \Swift_Message('Votre commande au Musée du Louvre'))
                 ->setFrom('louvre.projet4@gmail.com')
                 ->setTo($this->clientEmail)
                 ->setBody(

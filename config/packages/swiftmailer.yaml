@@ -1,10 +1,9 @@
 swiftmailer:
-    transport: smtp
-    username: louvre.projet4@gmail.com
-    password: LouvreOCR-4
-    auth_mode: login
-    disable_delivery: false
-    encryption: tls
-    port: 587
+    transport: gmail
+    auth_mode: login 
+    port: 465 
+    host: smtp.gmail.com 
+    username: 'louvre.projet4@gmail.com' 
+    password: 'LouvreOCR-4' 
     spool: { type: 'memory' }
             
