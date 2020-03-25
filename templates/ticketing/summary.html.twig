@@ -40,7 +40,7 @@
                     {% endif %}
                     <p>Nom et prénom : {{ ticket.visitorName }}</br>
                     Date de naissance : {{ ticket.visitorBirthday | date('d/m/Y') }}</br>
-                    {% if ticket.reduction %}Bénéficie d'une réduction - Une pièce justificative pourra vous être demandée</br>
+                    {% if ticket.reduction %}Bénéficie d'une réduction - Une pièce justificative pourra vous être demandée.</br>
                     {% else %}Ne bénéficie pas de réduction</br>
                     {% endif %}
                     Prix du billet : {{ ticket.price }}€</p>  

@@ -14,10 +14,20 @@
         <div id="main">
             <article id="billetterie" class="panel">
             
-                <p>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}.</p>
-                {% if dateFalse %} Les dimanches, les jours fériés et les jours passés ne sont pas ouverts à la réservation.<br/>
-                Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
-                {% else %} Tous les billets ont été vendus pour cette date.
+                {% if dateFalse %} 
+                    <p>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}.
+                    Les dimanches, les jours fériés et les jours passés ne sont pas ouverts à la réservation.</p><br/>
+                    Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
+                    
+                {% else %}
+                    {% if canBuyTicketsAmount > 0 %} 
+                        Vous ne pouvez pas acheter {{ numberTickets }} billets pour le {{ visitDate | date('d/m/Y') }}.</br>
+                        {% if canBuyTicketsAmount ==1 %} 
+                            Il ne reste qu'un billet disponible à la réservation.
+                            {% else %} Il ne reste que {{ canBuyTicketsAmount}} billets disponibles à la réservation.
+                        {% endif %}
+                    {% else %}Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}. Tous les billets ont déjà été vendus pour cette date.
+                    {% endif %}
                 {% endif %}
                 <br/>
                 <br/>

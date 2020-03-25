@@ -14,7 +14,8 @@
             {{ form_start(form_collection) }} 
             {% if numberTickets>1 %}
             {% set i = currentVisitor %}
-				<h4>Visiteur n°{{ i }}</h4></br>
+				<h4>Informations concernant le visiteur n°{{ i }}</h4></br>
+            {% else %}<h4>Informations concernant le visiteur</h4></br>
             {% endif %}        
                 {{ form_row(form_collection.visitorName) }}</br>
 				{{ form_row(form_collection.visitorBirthday) }}</br>

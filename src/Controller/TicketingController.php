@@ -135,7 +135,9 @@ class TicketingController extends AbstractController
                             if(!$canBuyTickets){
                                 return $this->render('ticketing/orderError.html.twig', [ 
                                     'visitDate' => $user->getVisitDate()->format('Y-m-d'),
-                                    'dateFalse' => $dateFalse
+                                    'dateFalse' => $dateFalse,
+                                    'canBuyTicketsAmount' => $canBuyTicketsAmount,
+                                    'numberTickets'       => $user->getNumberTickets()
                                     ]);
                             }
                         }
@@ -162,8 +164,7 @@ class TicketingController extends AbstractController
         
         return $this->render('ticketing/choiceForm.html.twig', [ 
             'choiceForm'          => $userForm->createView(),
-            'title'               => 'Choix des billets et identification du client',
-            'canBuyTicketsAmount' => $canBuyTicketsAmount
+            'title'               => 'Choix des billets et identification du client'
             ]);
     
     }
@@ -204,6 +205,10 @@ class TicketingController extends AbstractController
                     $ticket = $ticketForm->getData();
                     $visitorBirthday = $ticket->getVisitorBirthday();
                     
+                    if($visitorBirthday >= new \Datetime('today')){
+                        return $this->render('ticketing/birthdayError.html.twig', []);
+                    }
+
                     if($visitorBirthday != null ){
                         $calculatePrice = New CalculatePrice();
                         $price = $calculatePrice->calculatePrice($ticket->getVisitorBirthday(), $ticket->getReduction(), $currentUser->getVisitDuration()); 
@@ -299,7 +304,7 @@ class TicketingController extends AbstractController
         $em->flush();
         
         $this->totalPrice = $currentUser->getTotalPrice();
-       // die(var_dump($currentUser->setTotalPrice($totalPrice)));
+
         return $this->render('ticketing/summary.html.twig', [
             'title'         => 'Récapitulatif de commande',
             'orderCode'     => $this->orderCode,
@@ -367,6 +372,7 @@ class TicketingController extends AbstractController
                 throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
             }
             
+            $this->currentNumberTickets = $currentUserId->getNumberTickets();
             $this->orderCode     = $currentUserId->getOrderCode();
             $this->clientEmail   = $currentUserId->getClientEmail();
             $this->visitDate     = $currentUserId->getVisitDate();
@@ -381,15 +387,16 @@ class TicketingController extends AbstractController
             }
             
             $message = (new \Swift_Message('Billetterie du Louvre'))
-                ->setFrom('billetteriedulouvre@gmail.com')
+                ->setFrom('louvre.projet4@gmail.com')
                 ->setTo($this->clientEmail)
                 ->setBody(
                     $this->renderView(
                         'ticketing/emailConfirmation.html.twig',[
-                            'orderCode'  => $this->orderCode,
-                            'visitDate'  => $this->visitDate,
-                            'totalPrice' => $this->totalPrice,
-                            'tickets'    => $tickets
+                            'numberTickets' => $this->currentNumberTickets,
+                            'orderCode'     => $this->orderCode,
+                            'visitDate'     => $this->visitDate,
+                            'totalPrice'    => $this->totalPrice,
+                            'tickets'       => $tickets
                         ]),
                     'text/html'
                 );
@@ -429,62 +436,4 @@ class TicketingController extends AbstractController
         return $this->render('ticketing/paiementCancelled.html.twig', [
             ]);
     }
-
-    /**
-     * @Route("/billetterie/confirmation", name="confirmation")
-     */ 
-    public function sendConfirmation(\Swift_Mailer $mailer, SessionInterface $session, EntityManagerInterface $em){
-
-        if($session->get('currentUserId')){  
-            $currentUserId = $session->get('currentUserId');
-        }
-
-        $repository = $em->getRepository(User::class);
-        $currentUser = $repository->findOneBy(['id' => $currentUserId]);
-        
-        if($session->get('currentIdOrder')){  
-            $currentIdOrder = $session->get('currentIdOrder');
-        }
-
-        $repository = $em->getRepository(Ticket::class);
-        $currentOrder = $repository->findOneBy(['idOrder' => $currentIdOrder]);
-  
-        if (!$currentOrder) {
-            throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
-        }
-
-       
-        $this->orderCode     = $currentUser->getOrderCode();
-        $this->clientEmail   = $currentUser->getClientEmail();
-        $this->visitDate     = $currentUser->getVisitDate();
-        $this->totalPrice    = $currentUser->getTotalPrice();
-
-        $tickets = $currentUser->getTickets();
-        foreach($tickets as $ticket)
-        {
-            $ticket = array(
-                'name' => $currentOrder->getVisitorName(),
-            );
-        }
-
-   //     $clientEmail = $currentUser->getClientEmail();
-        
-        $message = (new \Swift_Message('Billetterie du Louvre'))
-            ->setFrom('billetteriedulouvre@gmail.com')
-            ->setTo($this->clientEmail)
-            ->setBody(
-                $this->renderView(
-                    'ticketing/emailConfirmation.html.twig',[
-                        'orderCode'  => $this->orderCode,
-                        'visitDate'  => $this->visitDate,
-                        'totalPrice' => $this->totalPrice,
-                        'tickets'    => $tickets
-                    ]),
-                'text/html'
-            );
-
-        $mailer->send($message);
-    
-        return $this->redirectToRoute('home');
-        }
-    }
+}

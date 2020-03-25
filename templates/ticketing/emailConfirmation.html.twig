@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    {% block title %}Votre commande au Musée du Louvre{% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+</head>
+
+{% block body %}
+    <img src="https://www.culture-first.fr/images/stories/virtuemart/manufacturer/resized/culture_first-louvre-logo1_235x140.jpg" alt="logo du Louvre" /></br>
+    <p>Bonjour,</br></br>
+    Votre commande a bien été enregistrée. Cet email fait foi de billet. Merci d'imprimer cet email ou de le présenter sur votre smartphone à l'entrée du Musée.</br></br>
+
+    Voici le récapitulatif de votre commande : </br>
+
+    Code de réservation : {{ orderCode }}</br>
+    Date de la visite : {{ visitDate | date('d/m/Y') }}</br>
+    Nombre de billets {{ numberTickets }}</br>
+    Prix total de la commande : {{ totalPrice }}</br>
+    
+    {% for ticket in tickets %}
+        {% if numberTickets>1 %}
+            Visiteur n°{{ loop.index }} : Nom et prénom : {{ ticket.visitorName }}</br>
+        {% endif %}
+        {% else %}Nom et prénom du visiteur : {{ ticket.visitorName }}</br>                    
+    {% endfor %}</p>
+                
+    <p>Nous restons à votre disposition pour toute information complémentaire.</br></br>
+
+    Cordialement,</br></br>
+
+    Nathalie pour le Musée du Louvre</p>
+		
+{% endblock %}
