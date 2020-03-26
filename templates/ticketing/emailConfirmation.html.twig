@@ -17,7 +17,7 @@
     Code de réservation : {{ orderCode }}</br>
     Date de la visite : {{ visitDate | date('d/m/Y') }}</br>
     Nombre de billets : {{ numberTickets }}</br>
-    Prix total de la commande : {{ totalPrice }}</br>
+    Prix total de la commande : {{ totalPrice }}€</br>
     
     {% for ticket in tickets %}
         {% if numberTickets>1 %}
