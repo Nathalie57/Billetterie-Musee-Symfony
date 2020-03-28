@@ -16,11 +16,8 @@ use App\Services\AuthorizedDate;
 use App\Services\PaiementManager;
 use App\Entity\User;
 use App\Entity\Ticket;
-//use App\Form\TicketCollectionType;
 use App\Form\UserType;
 use App\Form\TicketType;
-//use App\Form\ClientType;
-use App\Form\StripeType;
 use Ramsey\Uuid\Uuid;
 use Stripe\Stripe;
 use Swift_Mailer;
@@ -324,7 +321,7 @@ class TicketingController extends AbstractController
     /**
      * @Route("/billetterie/paiement", name="paiement")
      */ 
-    public function paiement(\Swift_Mailer $mailer, EntityManagerInterface $em, Request $request, SessionInterface $session, UrlGeneratorInterface $router){
+    public function paiement(EntityManagerInterface $em, Request $request, SessionInterface $session, UrlGeneratorInterface $router){
         
         if($session->get('currentUserId')){  
             $currentUserId = $session->get('currentUserId');
@@ -359,51 +356,7 @@ class TicketingController extends AbstractController
         $em->persist($currentUserId);
         $em->flush();
 
-        if($successUrl){
-
-            if($session->get('currentIdOrder')){  
-                $currentIdOrder = $session->get('currentIdOrder');
-            }
-            
-            $repository = $em->getRepository(Ticket::class);
-            $currentOrder = $repository->findOneBy(['idOrder' => $currentIdOrder]);
-  
-            if (!$currentOrder) {
-                throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
-            }
-            
-            $this->currentNumberTickets = $currentUserId->getNumberTickets();
-            $this->orderCode     = $currentUserId->getOrderCode();
-            $this->clientEmail   = $currentUserId->getClientEmail();
-            $this->visitDate     = $currentUserId->getVisitDate();
-            $this->totalPrice    = $currentUserId->getTotalPrice();
-
-            $tickets = $currentUserId->getTickets();
-            foreach($tickets as $ticket)
-            {
-                $ticket = array(
-                    'name' => $currentOrder->getVisitorName(),
-                );
-            }
-            
-            $message = (new \Swift_Message('Votre commande au Musée du Louvre'))
-                ->setFrom('louvre.projet4@gmail.com')
-                ->setTo($this->clientEmail)
-                ->setBody(
-                    $this->renderView(
-                        'ticketing/emailConfirmation.html.twig',[
-                            'numberTickets' => $this->currentNumberTickets,
-                            'orderCode'     => $this->orderCode,
-                            'visitDate'     => $this->visitDate,
-                            'totalPrice'    => $this->totalPrice,
-                            'tickets'       => $tickets
-                        ]),
-                    'text/html'
-                );
-
-            $mailer->send($message);
-        }
-
+        
         return $this->render('ticketing/checkout.html.twig', [
             'CHECKOUT_SESSION_ID' => $sessionStripe->id,
             ]);
@@ -412,20 +365,66 @@ class TicketingController extends AbstractController
     /**
      * @Route("/billetterie/paiement/success", name="paiement_success")
      */ 
-    public function paiementSuccess(SessionInterface $session, EntityManagerInterface $em){
+    public function paiementSuccess(\Swift_Mailer $mailer, SessionInterface $session, EntityManagerInterface $em){
         
+        if($session->get('currentIdOrder')){  
+            $currentIdOrder = $session->get('currentIdOrder');
+        }
+            
+        $repository = $em->getRepository(Ticket::class);
+        $currentOrder = $repository->findOneBy(['idOrder' => $currentIdOrder]);
+           
         if($session->get('currentUserId')){  
             $currentUserId = $session->get('currentUserId');
         }
-
+    
         $repository = $em->getRepository(User::class);
         $currentUserId = $repository->findOneBy(['id' => $currentUserId]);
+  
+        if (!$currentOrder) {
+            throw $this->createNotFoundException(sprintf('No Tickets for id "%s"', $currentIdOrder));
+        }
+            
+        $this->currentNumberTickets = $currentUserId->getNumberTickets();
+        $this->orderCode     = $currentUserId->getOrderCode();
+        $this->clientEmail   = $currentUserId->getClientEmail();
+        $this->visitDate     = $currentUserId->getVisitDate();
+        $this->totalPrice    = $currentUserId->getTotalPrice();
+
+        $tickets = $currentUserId->getTickets();
+        foreach($tickets as $ticket)
+        {
+            $ticket = array(
+                'name' => $currentOrder->getVisitorName(),
+            );
+        }
+        
+        $message = (new \Swift_Message('Votre commande au Musée du Louvre'))
+            ->setFrom('louvre.projet4@gmail.com')
+            ->setTo($this->clientEmail)
+            ->setBody(
+                $this->renderView(
+                    'ticketing/emailConfirmation.html.twig',[
+                        'numberTickets' => $this->currentNumberTickets,
+                        'orderCode'     => $this->orderCode,
+                        'visitDate'     => $this->visitDate,
+                        'totalPrice'    => $this->totalPrice,
+                        'tickets'       => $tickets
+                    ]),
+                'text/html'
+            );
+
+       
+
+        $mailer->send($message);
 
         $clientEmail = $currentUserId->getClientEmail();
 
         return $this->render('ticketing/paiementSuccess.html.twig', [
             'clientEmail' => $clientEmail
             ]);
+        
+            session_destroy();
     }
 
      /**
