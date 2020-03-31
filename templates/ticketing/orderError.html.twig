@@ -16,7 +16,7 @@
             
                 {% if dateFalse %} 
                     <p>Vous ne pouvez pas acheter de billets pour le {{ visitDate | date('d/m/Y') }}.
-                    Les dimanches, les jours fériés et les jours passés ne sont pas ouverts à la réservation.</p><br/>
+                    Les dimanches, les jours fériés, les jours passés et le jour même après 14h ne sont pas ouverts à la réservation.</p><br/>
                     Le musée est fermé les mardi, le 1er mai, le 1er novembre et le 25 décembre.
                     
                 {% else %}
@@ -38,6 +38,11 @@
 
 	        </article>
 	    </div>
+	<div id="footer">
+		<ul class="copyright">
+			<li>Mentions légales</li><li>&copy; Musée du Louvre - Tous droits de reproduction réservés</li><li><a href="www.louvre.fr">Retour sur le site du Musée</a></li><li>Tél : 01 40 20 50 50</li>
+		</ul>
+	</div>
 	    </div>
     </body>
 

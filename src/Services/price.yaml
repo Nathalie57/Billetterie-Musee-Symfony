@@ -4,7 +4,7 @@ bebe :
   prix_demi_journee : 0
 
 enfant :
-  age_max :           12
+  age_max :           11
   prix :              8
   prix_demi_journee : 4
 

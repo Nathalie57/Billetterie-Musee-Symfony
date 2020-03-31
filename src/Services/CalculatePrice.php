@@ -42,7 +42,6 @@ class CalculatePrice{
             if($visitorBirthday < $dateDay) $age = $visitorBirthday->diff($dateDay)->format('%y');
             $intAge = (int)$age;
         }
-//die(var_dump($visitorBirthday, $dateDay, $reduction, $visitDuration));
         else return 'false';
         
         if($intAge>=0){
@@ -57,6 +56,5 @@ class CalculatePrice{
             if($visitDuration == .5)                               return $this->halfPriceSenior;
             if($visitDuration == 1)                             return $this->fullPriceSenior;
         }
-       // die(var_dump($this->ageNormal).var_dump($intAge));
     }
 }

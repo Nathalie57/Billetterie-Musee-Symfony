@@ -21,9 +21,9 @@
     
     {% for ticket in tickets %}
         {% if numberTickets>1 %}
-            Visiteur n°{{ loop.index }} : Nom et prénom : {{ ticket.visitorName }}</br>
-        {% endif %}
-        {% else %}Nom et prénom du visiteur : {{ ticket.visitorName }}</br>                    
+            Nom et prénom du visiteur n°{{ loop.index }} : {{ ticket.visitorName }}</br>
+        {% else %}Nom et prénom du visiteur : {{ ticket.visitorName }}</br>       
+        {% endif %}             
     {% endfor %}</p>
                 
     <p>Nous restons à votre disposition pour toute information complémentaire.</br></br>
