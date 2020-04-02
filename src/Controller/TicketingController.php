@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use App\Services\CalculatePrice;
 use App\Services\AuthorizedDate;
-use App\Services\PaiementManager;
 use App\Entity\User;
 use App\Entity\Ticket;
 use App\Form\UserType;
@@ -163,8 +162,8 @@ class TicketingController extends AbstractController
             'choiceForm'          => $userForm->createView(),
             'title'               => 'Choix des billets et identification du client'
             ]);
-    
     }
+
     /**
      * @Route("/billetterie/commande", name="visitors_designation")
      */
@@ -218,8 +217,8 @@ class TicketingController extends AbstractController
                     $em->flush();
 
                     $currentIdOrder = $currentUser->getId();
-                 //die(var_dump($currentVisitor));                  
-                if($currentNumberTickets>$currentVisitor) return $this->redirectToRoute('visitors_designation');
+
+                    if($currentNumberTickets>$currentVisitor) return $this->redirectToRoute('visitors_designation');
                
                 return $this->redirectToRoute('summary');
                 }   
@@ -238,7 +237,7 @@ class TicketingController extends AbstractController
             'numberTickets' => $currentUser->getNumberTickets(),
             'currentVisitor' => $session->get('currentVisitor')+1
             ]);    
-        }          
+    }          
 
     /**
      * @Route("/billetterie/recapitulatif", name="summary")
@@ -276,7 +275,6 @@ class TicketingController extends AbstractController
 
         $tickets = $currentUser->getTickets();
         
-
         foreach($tickets as $ticket)
         {            
             $ticket = array(
@@ -358,7 +356,7 @@ class TicketingController extends AbstractController
         
         return $this->render('ticketing/checkout.html.twig', [
             'CHECKOUT_SESSION_ID' => $sessionStripe->id,
-            ]);
+        ]);
     }
 
     /**
@@ -411,10 +409,10 @@ class TicketingController extends AbstractController
                         'tickets'       => $tickets
                     ]),
                 'text/html'
-            );
-
-       
-
+            );     
+        
+        session_destroy();
+        
         $mailer->send($message);
 
         $clientEmail = $currentUserId->getClientEmail();
@@ -422,8 +420,6 @@ class TicketingController extends AbstractController
         return $this->render('ticketing/paiementSuccess.html.twig', [
             'clientEmail' => $clientEmail
             ]);
-        
-            session_destroy();
     }
 
      /**

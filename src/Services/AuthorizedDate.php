@@ -23,10 +23,6 @@ class AuthorizedDate{
         $this->openingHour = $value['horaires']['ouverture'];
         $this->afternoon   = $value['horaires']['apres_midi'];
         $this->closingHour = $value['horaires']['fermeture'];
-
-        /********* probablement inutiles ********/
-       // $this->offDays    = $value['jours_feriés_fermés'];
-       // $this->offOrderDays     = $value['jours_non_réservables'];
     }
 
     private function calculateOffDays($currentDate)
