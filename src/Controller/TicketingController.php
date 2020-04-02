@@ -301,7 +301,7 @@ class TicketingController extends AbstractController
         $em->flush();
         
         $this->totalPrice = $currentUser->getTotalPrice();
-
+      
         return $this->render('ticketing/summary.html.twig', [
             'title'         => 'Récapitulatif de commande',
             'orderCode'     => $this->orderCode,
@@ -355,7 +355,6 @@ class TicketingController extends AbstractController
         $currentUserId->setToken($sessionStripe->id);
         $em->persist($currentUserId);
         $em->flush();
-
         
         return $this->render('ticketing/checkout.html.twig', [
             'CHECKOUT_SESSION_ID' => $sessionStripe->id,

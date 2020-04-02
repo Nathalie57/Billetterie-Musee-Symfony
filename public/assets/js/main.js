@@ -80,8 +80,8 @@
 						.hide();
 
 				// Activate link.
-					$link
-						.addClass('active');
+			//		$link
+			//			.addClass('active');
 
 				// Reset scroll.
 					$window.scrollTop(0);
