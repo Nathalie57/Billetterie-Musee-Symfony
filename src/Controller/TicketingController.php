@@ -169,8 +169,13 @@ class TicketingController extends AbstractController
      */
     public function visitorsDesignation(EntityManagerInterface $em, Request $request, User $user = null, Ticket $ticket = null, CalculatePrice $calculatePrice, SessionInterface $session){
         
+
         if($session->get('currentUserId')){  
             $sessionUserId = $session->get('currentUserId');
+        }
+
+        if(!isset($sessionUserId)){
+            return $this->redirectToRoute('timed_out_session');
         }
                 
         $repository = $em->getRepository(User::class);
@@ -428,6 +433,15 @@ class TicketingController extends AbstractController
     public function paiementCancelled(SessionInterface $session, EntityManagerInterface $em){
         
         return $this->render('ticketing/paiementCancelled.html.twig', [
+            ]);
+    }
+
+    /**
+     * @Route("/billetterie/expiration", name="timed_out_session")
+     */ 
+    public function timedOutSession(SessionInterface $session, EntityManagerInterface $em){
+        
+        return $this->render('ticketing/timedOutSession.html.twig', [
             ]);
     }
 }
